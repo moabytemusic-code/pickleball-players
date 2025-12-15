@@ -1,0 +1,312 @@
+{
+    "project": {
+        "name": "PickleballPlayers",
+        "domain": "https://pickleballplayers.app",
+        "tagline": "Find. Play. Book. Pickleball—Anywhere.",
+        "pricing": {
+            "free": "Player directory access with limited listing details + ads",
+            "pro_monthly": 11.99,
+            "currency": "USD",
+            "pro_includes": [
+                "Claim & verify listing",
+                "Up to 10 photos",
+                "Amenities + booking link",
+                "Events manager",
+                "Highlighted map pin + verified badge",
+                "Analytics dashboard",
+                "1 geo push notification per month",
+                "No ads on their listing"
+            ]
+        }
+    },
+    "missions": [
+        {
+            "id": "M0",
+            "title": "Product Guardrails & Compliance",
+            "objective": "Define legal/compliance guardrails for data ingestion and directory listings; produce clear policies and app disclaimers.",
+            "context": {
+                "app_type": "Pickleball court & amenities directory for US + Canada",
+                "monetization": [
+                    "AdMob ads for free users",
+                    "Stripe subscription for Pro businesses"
+                ],
+                "data_sources": "Publicly available sources only"
+            },
+            "constraints": [
+                "Do NOT scrape behind logins/paywalls",
+                "Respect robots.txt and site ToS where applicable",
+                "Rate-limit requests and avoid aggressive crawling",
+                "Provide a clear listing claim/edit/remove process",
+                "Store only directory-relevant public facts (no sensitive personal data)"
+            ],
+            "deliverables": [
+                "Data Use Policy (plain English)",
+                "Owner Claim + Edit Policy",
+                "Removal/Correction Policy",
+                "Privacy Policy outline (MVP)",
+                "Terms of Service outline (MVP)",
+                "In-app disclaimer text for unverified listings"
+            ],
+            "acceptance_criteria": [
+                "Policies explicitly limit ingestion to public info and include a removal path",
+                "Clear claim workflow requirements and verification methods defined",
+                "All policy docs are ready to paste into a website/app"
+            ]
+        },
+        {
+            "id": "M1",
+            "title": "Data Ingestion Pipeline (Pilot Cities)",
+            "objective": "Build a Python ingestion pipeline that collects, normalizes, and stores pickleball court listings for pilot cities (US + Canada) with confidence scoring.",
+            "tech_stack": [
+                "Python",
+                "Requests",
+                "BeautifulSoup4",
+                "Selenium (fallback only)",
+                "PostgreSQL or Supabase",
+                "Geocoding API"
+            ],
+            "inputs": {
+                "pilot_cities": [
+                    {
+                        "city": "Tampa",
+                        "region": "FL",
+                        "country": "US"
+                    },
+                    {
+                        "city": "Austin",
+                        "region": "TX",
+                        "country": "US"
+                    },
+                    {
+                        "city": "Phoenix",
+                        "region": "AZ",
+                        "country": "US"
+                    },
+                    {
+                        "city": "San Diego",
+                        "region": "CA",
+                        "country": "US"
+                    },
+                    {
+                        "city": "Toronto",
+                        "region": "ON",
+                        "country": "CA"
+                    }
+                ],
+                "required_fields": [
+                    "name",
+                    "address",
+                    "city",
+                    "region",
+                    "postal_code",
+                    "country",
+                    "latitude",
+                    "longitude",
+                    "indoor_outdoor",
+                    "court_count",
+                    "surface",
+                    "lights",
+                    "public_private",
+                    "website",
+                    "phone"
+                ]
+            },
+            "constraints": [
+                "Prioritize open municipal datasets and parks/recreation pages first",
+                "Check robots.txt before scraping a site; skip if disallowed",
+                "Implement rate limits (sleep/jitter) and retry with backoff",
+                "Selenium only if required for dynamic pages",
+                "Geocode only when address is present; cache results",
+                "Add confidence_score (0-100) based on source trust + field completeness",
+                "Flag suspicious results: tennis-only, duplicates, missing address"
+            ],
+            "deliverables": [
+                "Source discovery script (find candidate pages/datasets for each pilot city)",
+                "Scrapers/parsers per source type",
+                "Normalizer that outputs a clean JSON file",
+                "Database seeding script (idempotent upsert)",
+                "Duplicate detection logic (address + geo proximity)",
+                "Confidence scoring + QA report export"
+            ],
+            "acceptance_criteria": [
+                "At least 200+ clean listings across pilot cities (or as many as available from public sources)",
+                "All records have lat/long OR are flagged for manual review",
+                "Duplicates are reduced and logged",
+                "JSON export + DB seed succeed without errors"
+            ]
+        },
+        {
+            "id": "M2",
+            "title": "Database Schema (Supabase/Postgres)",
+            "objective": "Create a production-ready schema to support courts, businesses, claims, events, photos, analytics, and subscriptions.",
+            "tech_stack": [
+                "PostgreSQL",
+                "Supabase"
+            ],
+            "constraints": [
+                "Design for scalability to all US + Canada",
+                "Support role-based access (player vs business/pro)",
+                "Support claimed/unclaimed listings",
+                "Support events as first-class objects"
+            ],
+            "deliverables": [
+                "SQL schema for tables: courts, court_sources, businesses, claims, photos, amenities, events, analytics_daily, subscriptions",
+                "Indexes for geo + search",
+                "RLS policy notes for Supabase",
+                "Seed scripts for pilot city import"
+            ],
+            "acceptance_criteria": [
+                "Schema supports: claim flow, events creation by verified pro users, analytics aggregation",
+                "Geo queries are performant (indexes planned/implemented)",
+                "RLS rules prevent non-owners from editing listings/events"
+            ]
+        },
+        {
+            "id": "M3",
+            "title": "Mobile App MVP (React Native Expo)",
+            "objective": "Build the MVP mobile app that shows courts on a map/list, supports filtering, and displays basic court details.",
+            "tech_stack": [
+                "React Native (Expo)",
+                "Supabase",
+                "Google Maps API"
+            ],
+            "features": [
+                "Auth: optional for players (guest browsing allowed)",
+                "Map view with court pins",
+                "List view sorted by distance",
+                "Filters: Indoor/Outdoor, Lights, Free vs Paid/Public vs Private",
+                "Court detail screen (basic data + directions button)",
+                "Ad placeholders in free tier screens"
+            ],
+            "constraints": [
+                "Mobile-first UX",
+                "Fast load: paginated/clustered pins when needed",
+                "Cache last seen region and recent searches"
+            ],
+            "deliverables": [
+                "Expo project scaffold",
+                "Map + list screens",
+                "Filter UI and query logic",
+                "Court detail page",
+                "Basic telemetry hooks (screen views)"
+            ],
+            "acceptance_criteria": [
+                "App can browse pilot city courts without crashing",
+                "Filters work and update results correctly",
+                "Court detail page shows accurate info + directions deep link"
+            ]
+        },
+        {
+            "id": "M4",
+            "title": "Pro Portal Web Dashboard",
+            "objective": "Build a web dashboard for Pro businesses to claim and manage listings, upload photos, and create events.",
+            "tech_stack": [
+                "Next.js or React",
+                "Supabase Auth + RLS",
+                "Storage (Supabase)"
+            ],
+            "features": [
+                "Business login (separate role)",
+                "Claim listing workflow",
+                "Edit listing: amenities, hours (optional), booking link, contacts",
+                "Upload/manage photos (up to 10)",
+                "Events manager: create/edit/delete events",
+                "Analytics dashboard (views/clicks/leads)",
+                "Stripe billing portal link"
+            ],
+            "constraints": [
+                "Only verified/claimed owners can edit",
+                "Audit trail for edits (basic)",
+                "Simple UX: 3-click path to update listing"
+            ],
+            "deliverables": [
+                "Dashboard UI",
+                "CRUD endpoints/queries for listings and events",
+                "Photo upload + validation",
+                "Analytics visualization (simple counts + trend)",
+                "Owner verification/claim status UI"
+            ],
+            "acceptance_criteria": [
+                "A Pro user can claim a listing and update it end-to-end",
+                "Events appear on the listing after creation",
+                "Non-owners cannot edit any listing/event (enforced)"
+            ]
+        },
+        {
+            "id": "M5",
+            "title": "Monetization: Stripe + AdMob",
+            "objective": "Implement $11.99/month Pro subscriptions and free-tier ads, with a 30-day Pro trial for claimed listings.",
+            "tech_stack": [
+                "Stripe",
+                "AdMob",
+                "Supabase",
+                "Webhook handling"
+            ],
+            "constraints": [
+                "Trial requires payment method (recommended) OR trial without card (optional) — choose one",
+                "Handle subscription state changes via webhooks",
+                "Grace period and downgrade to Basic on cancellation"
+            ],
+            "deliverables": [
+                "Stripe products/prices setup guide",
+                "Checkout flow + subscription creation",
+                "Webhook handler (active, past_due, canceled)",
+                "Entitlement checks (pro features gated)",
+                "AdMob integration for free tier screens"
+            ],
+            "acceptance_criteria": [
+                "Subscription activates Pro entitlements immediately",
+                "Cancel/delinquent states correctly remove Pro privileges",
+                "Ads show on free tier views and are hidden on Pro listing page"
+            ]
+        },
+        {
+            "id": "M6",
+            "title": "Growth Engine: Claim Campaign + Email Automation",
+            "objective": "Launch a B2B outreach system that nudges facilities to claim listings, activate trials, and convert to Pro.",
+            "tech_stack": [
+                "Email platform (Brevo or similar)",
+                "Supabase",
+                "Basic CRM spreadsheet/export"
+            ],
+            "inputs": {
+                "brand": "PickleballPlayers",
+                "domain": "pickleballplayers.app",
+                "offer": "Free 30-day Pro pass for claimed courts"
+            },
+            "deliverables": [
+                "5-email B2B sequence (personalized with court name/city)",
+                "Claim landing page copy (for unclaimed listings)",
+                "CTA links pattern (utm + claim token)",
+                "Lead list export format from database (CSV)",
+                "Reply-handling templates for common objections"
+            ],
+            "acceptance_criteria": [
+                "Emails are ready to import into an ESP",
+                "Every email drives to a claim URL that maps back to a listing",
+                "System can export leads for targeted outreach city-by-city"
+            ]
+        },
+        {
+            "id": "M7",
+            "title": "Scale Plan: US + Canada Nationwide Expansion",
+            "objective": "After pilot validation, expand ingestion to nationwide coverage with quality controls and owner-claim pathways.",
+            "constraints": [
+                "Scale data ingestion by province/state batches",
+                "Add continuous refresh jobs for data updates",
+                "Prioritize accuracy: do not publish low-confidence listings without flags"
+            ],
+            "deliverables": [
+                "State/province ingestion schedule",
+                "Automated refresh + change detection plan",
+                "Manual QA workflow (spot checks)",
+                "Verified badge rules + reporting pipeline"
+            ],
+            "acceptance_criteria": [
+                "Repeatable ingestion process that can run weekly/monthly",
+                "Clear QA metrics and reporting for data quality",
+                "Claim/removal requests can be processed quickly"
+            ]
+        }
+    ]
+}
