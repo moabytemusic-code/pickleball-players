@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { LayoutDashboard, MapPin, Users, Settings, TrendingUp } from "lucide-react";
+import { LayoutDashboard, MapPin, Users, Settings, TrendingUp, Database } from "lucide-react";
 import { Navbar } from "@/components/navbar";
 
 export default function AdminLayout({
@@ -48,6 +48,13 @@ export default function AdminLayout({
                         >
                             <Users size={20} />
                             Users
+                        </Link>
+                        <Link
+                            href="/admin/data"
+                            className="flex items-center gap-3 px-3 py-2 text-gray-700 rounded-md hover:bg-gray-100 mb-1"
+                        >
+                            <Database size={20} />
+                            Data Import
                         </Link>
                     </nav>
                 </aside>

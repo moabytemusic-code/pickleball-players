@@ -192,6 +192,10 @@ def harvest_osm(location_name):
     print(f"🎉 Finished. Imported {count} new locations.")
 
 if __name__ == "__main__":
-    # You can change this to any city!
-    city = input("Enter city to harvest (e.g. 'Dallas, TX'): ") or "Austin, TX"
+    import sys
+    if len(sys.argv) > 1:
+        city = sys.argv[1]
+    else:
+        city = input("Enter city to harvest (e.g. 'Dallas, TX'): ") or "Austin, TX"
+    
     harvest_osm(city)
