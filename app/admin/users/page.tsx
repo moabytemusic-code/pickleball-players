@@ -86,7 +86,7 @@ export default async function AdminUsersPage({ searchParams }: { searchParams: {
                         className="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary text-gray-900 bg-white"
                     />
                 </div>
-                <button type="submit" className="px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50">Filter</button>
+                <button type="submit" className="px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 text-gray-700 font-medium">Filter</button>
             </form>
 
             <div className="bg-white rounded-xl shadow border border-gray-200 overflow-hidden">
