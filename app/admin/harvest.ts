@@ -9,6 +9,35 @@ const supabaseAdmin = createClient(
     { auth: { persistSession: false } }
 )
 
+// Helper for rate limiting (1 sec delay)
+const sleep = (ms: number) => new Promise(r => setTimeout(r, ms));
+
+async function reverseGeocode(lat: number, lng: number) {
+    try {
+        await sleep(1100); // Rate Limit
+        const revUrl = `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json`;
+        const revRes = await fetch(revUrl, {
+            headers: { 'User-Agent': 'PickleballPlayersBot/1.0' }
+        });
+
+        if (revRes.ok) {
+            const revData = await revRes.json();
+            const addr = revData.address || {};
+            // Logic: Park > Leisure > Building > Road
+            const placeName = addr.park || addr.leisure || addr.recreation_ground || addr.stadium || addr.building || addr.road;
+
+            return {
+                placeName: placeName,
+                city: addr.city || addr.town || addr.village,
+                fullAddress: revData.display_name
+            };
+        }
+    } catch (err) {
+        console.error("Reverse Geocode failed", err);
+    }
+    return null;
+}
+
 export async function harvestCity(cityName: string) {
     const logs: string[] = [];
     logs.push(`🚀 Starting harvest for: ${cityName}`);

@@ -72,7 +72,7 @@ export function Navbar({ position = "absolute", className = "" }: NavbarProps) {
                 {/* Desktop Links */}
                 <div className="hidden lg:flex lg:gap-x-12">
                     {navigation.map((item) => (
-                        <Link key={item.name} href={item.href} className="text-sm font-semibold leading-6 text-foreground hover:text-primary transition-colors">
+                        <Link key={item.name} href={item.href} className="text-sm font-semibold leading-6 text-gray-900 hover:text-primary transition-colors">
                             {item.name}
                         </Link>
                     ))}
@@ -82,16 +82,16 @@ export function Navbar({ position = "absolute", className = "" }: NavbarProps) {
                 <div className="hidden lg:flex lg:flex-1 lg:justify-end gap-x-4">
                     {user ? (
                         <div className="flex items-center gap-4">
-                            <Link href="/profile" className="text-sm font-semibold text-foreground/80 hover:text-primary transition-colors">
+                            <Link href="/profile" className="text-sm font-semibold text-gray-900 hover:text-primary transition-colors">
                                 {user.email?.split('@')[0]}
                             </Link>
-                            <button onClick={handleSignOut} className="text-sm font-semibold leading-6 text-foreground hover:text-red-500 transition-colors my-auto flex items-center gap-1">
+                            <button onClick={handleSignOut} className="text-sm font-semibold leading-6 text-gray-900 hover:text-red-500 transition-colors my-auto flex items-center gap-1">
                                 <LogOut className="w-4 h-4" />
                                 Sign out
                             </button>
                         </div>
                     ) : (
-                        <Link href="/login" className="text-sm font-semibold leading-6 text-foreground hover:text-primary transition-colors my-auto">
+                        <Link href="/login" className="text-sm font-semibold leading-6 text-gray-900 hover:text-primary transition-colors my-auto">
                             Log in
                         </Link>
                     )}
