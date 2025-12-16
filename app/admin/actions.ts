@@ -130,3 +130,47 @@ export async function deletePhoto(photoId: string, courtId: string) {
     revalidatePath(`/court/${courtId}`);
     return { success: true };
 }
+
+export async function updateUserRole(userId: string, role: string) {
+    if (!await checkAdmin()) return { error: "Unauthorized" };
+
+    const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+    if (!serviceRoleKey) return { error: "Missing Admin Key" };
+
+    const supabaseAdmin = createClient();
+    // Use raw Supabase Admin Client for auth management
+    const adminAuthClient = (await import('@supabase/supabase-js')).createClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        serviceRoleKey,
+        { auth: { autoRefreshToken: false, persistSession: false } }
+    );
+
+    const { error } = await adminAuthClient.auth.admin.updateUserById(userId, {
+        app_metadata: { role }
+    });
+
+    if (error) return { error: error.message };
+
+    revalidatePath('/admin/users');
+    return { success: true };
+}
+
+export async function deleteUser(userId: string) {
+    if (!await checkAdmin()) return { error: "Unauthorized" };
+
+    const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+    if (!serviceRoleKey) return { error: "Missing Admin Key" };
+
+    const adminAuthClient = (await import('@supabase/supabase-js')).createClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        serviceRoleKey,
+        { auth: { autoRefreshToken: false, persistSession: false } }
+    );
+
+    const { error } = await adminAuthClient.auth.admin.deleteUser(userId);
+
+    if (error) return { error: error.message };
+
+    revalidatePath('/admin/users');
+    return { success: true };
+}

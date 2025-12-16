@@ -3,6 +3,7 @@ import { createClient as createAdminClient } from '@supabase/supabase-js'
 import { Navbar } from "@/components/navbar";
 import { Search, User, Shield, AlertTriangle } from "lucide-react";
 import { redirect } from "next/navigation";
+import { UserActions } from "./user-actions";
 
 export const dynamic = 'force-dynamic';
 
@@ -97,6 +98,7 @@ export default async function AdminUsersPage({ searchParams }: { searchParams: {
                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Joined</th>
                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
+                            <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                         </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
@@ -123,6 +125,9 @@ export default async function AdminUsersPage({ searchParams }: { searchParams: {
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap text-xs text-gray-400 font-mono">
                                     {u.id}
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap text-right">
+                                    <UserActions userId={u.id} currentRole={u.role} />
                                 </td>
                             </tr>
                         ))}

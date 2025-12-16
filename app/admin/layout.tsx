@@ -10,7 +10,10 @@ export default function AdminLayout({
     return (
         <div className="min-h-screen bg-gray-50 flex flex-col">
             {/* Use Public Navbar for consistent logged-in state/auth button */}
-            <Navbar />
+            {/* Use Public Navbar for consistent logged-in state/auth button */}
+            <div className="bg-white border-b border-gray-200">
+                <Navbar position="relative" />
+            </div>
 
             <div className="flex flex-1">
                 {/* Sidebar */}
