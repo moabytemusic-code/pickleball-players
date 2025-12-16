@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { Search, MapPin, ArrowRight } from "lucide-react";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 export function Hero() {
     const [query, setQuery] = useState("");
@@ -30,7 +31,7 @@ export function Hero() {
                         transition={{ duration: 0.5 }}
                         className="mt-24 sm:mt-32 lg:mt-16"
                     >
-                        <a href="#" className="inline-flex space-x-6">
+                        <Link href="/pro" className="inline-flex space-x-6">
                             <span className="rounded-full bg-green-600/10 px-3 py-1 text-sm font-semibold leading-6 text-green-600 ring-1 ring-inset ring-green-600/10 dark:bg-green-400/10 dark:text-green-400 dark:ring-green-400/20">
                                 New
                             </span>
@@ -38,7 +39,7 @@ export function Hero() {
                                 <span>Just launched: Pro Analytics</span>
                                 <ArrowRight className="h-4 w-4" />
                             </span>
-                        </a>
+                        </Link>
                     </motion.div>
 
                     <motion.h1
@@ -96,7 +97,10 @@ export function Hero() {
                         transition={{ duration: 0.5, delay: 0.4 }}
                         className="mt-6 text-sm text-gray-500"
                     >
-                        Trending: <span className="text-foreground underline decoration-dotted cursor-pointer hover:text-primary">Austin</span>, <span className="text-foreground underline decoration-dotted cursor-pointer hover:text-primary">Naples</span>, <span className="text-foreground underline decoration-dotted cursor-pointer hover:text-primary">Scottsdale</span>
+                        Trending:
+                        <Link href="/search?q=Austin" className="text-foreground underline decoration-dotted cursor-pointer hover:text-primary ml-1">Austin</Link>,
+                        <Link href="/search?q=Naples" className="text-foreground underline decoration-dotted cursor-pointer hover:text-primary ml-1">Naples</Link>,
+                        <Link href="/search?q=Scottsdale" className="text-foreground underline decoration-dotted cursor-pointer hover:text-primary ml-1">Scottsdale</Link>
                     </motion.div>
 
                 </div>
@@ -105,26 +109,39 @@ export function Hero() {
                 <div className="mx-auto mt-16 flex max-w-2xl sm:mt-24 lg:ml-10 lg:mt-0 lg:mr-0 lg:max-w-none lg:flex-none xl:ml-32">
                     <div className="max-w-3xl flex-none sm:max-w-5xl lg:max-w-none">
                         <div className="-m-2 rounded-xl bg-gray-900/5 p-2 ring-1 ring-inset ring-gray-900/10 lg:-m-4 lg:rounded-2xl lg:p-4 dark:bg-white/5 dark:ring-white/10">
-                            {/* This image needs to be real later, using a placeholder gradient for now */}
-                            <div className="w-[40rem] h-[30rem] rounded-md bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-900 flex items-center justify-center text-gray-400 shadow-2xl overflow-hidden relative">
-                                <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, black 1px, transparent 0)', backgroundSize: '24px 24px' }}></div>
+                            {/* Hero Image */}
+                            <div className="relative w-[40rem] h-[30rem] rounded-2xl overflow-hidden shadow-2xl ring-1 ring-gray-900/10 dark:ring-white/10 group">
+                                <img
+                                    src="/hero-pickleball.png"
+                                    alt="Pickleball Court"
+                                    className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                                />
+                                <div className="absolute inset-0 bg-gradient-to-t from-gray-900/60 via-transparent to-transparent" />
 
-                                {/* Mock Map UI Elements */}
-                                <div className="absolute top-1/3 left-1/4">
+                                {/* Floating Map Markers for effect */}
+                                <motion.div
+                                    initial={{ opacity: 0, y: 20 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    transition={{ delay: 0.5, duration: 0.5 }}
+                                    className="absolute top-1/3 left-1/4"
+                                >
                                     <div className="flex flex-col items-center">
-                                        <div className="px-3 py-1 bg-white dark:bg-gray-800 rounded-lg shadow-lg text-xs font-bold mb-1 border border-gray-100 dark:border-gray-700">Fairview Park</div>
+                                        <div className="px-3 py-1 bg-white dark:bg-gray-800 rounded-lg shadow-lg text-xs font-bold mb-1 border border-gray-100 dark:border-gray-700 transform -translate-y-2">Fairview Park</div>
                                         <div className="w-4 h-4 rounded-full bg-primary border-2 border-white dark:border-gray-800 shadow-xl animate-bounce" />
                                     </div>
-                                </div>
+                                </motion.div>
 
-                                <div className="absolute top-1/2 left-1/2">
+                                <motion.div
+                                    initial={{ opacity: 0, y: 20 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    transition={{ delay: 0.7, duration: 0.5 }}
+                                    className="absolute top-1/2 left-1/2"
+                                >
                                     <div className="flex flex-col items-center">
-                                        <div className="px-3 py-1 bg-white dark:bg-gray-800 rounded-lg shadow-lg text-xs font-bold mb-1 border border-gray-100 dark:border-gray-700">Downtown Rec</div>
+                                        <div className="px-3 py-1 bg-white dark:bg-gray-800 rounded-lg shadow-lg text-xs font-bold mb-1 border border-gray-100 dark:border-gray-700 transform -translate-y-2">Downtown Rec</div>
                                         <div className="w-4 h-4 rounded-full bg-green-500 border-2 border-white dark:border-gray-800 shadow-xl" />
                                     </div>
-                                </div>
-
-                                <span className="text-sm font-medium z-10">Map View Preview</span>
+                                </motion.div>
                             </div>
                         </div>
                     </div>
