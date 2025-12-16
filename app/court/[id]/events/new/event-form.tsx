@@ -33,6 +33,11 @@ export function EventForm({ courtId }: { courtId: string }) {
                 <input type="text" name="title" required className="mt-2 block w-full rounded-md border-0 py-1.5 px-3 text-black ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-primary sm:text-sm sm:leading-6" placeholder="e.g. Saturday Morning Round Robin" />
             </div>
 
+            <div>
+                <label className="block text-sm font-medium leading-6 text-foreground">Description</label>
+                <textarea name="description" rows={3} className="mt-2 block w-full rounded-md border-0 py-1.5 px-3 text-black ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-primary sm:text-sm sm:leading-6" placeholder="Details about the format, prizes, or what to bring..." />
+            </div>
+
             <div className="grid grid-cols-2 gap-4">
                 <div>
                     <label className="block text-sm font-medium leading-6 text-foreground">Date</label>

@@ -13,6 +13,7 @@ export async function createEvent(courtId: string, formData: FormData) {
     }
 
     const title = formData.get('title') as string;
+    const description = formData.get('description') as string;
     const date = formData.get('date') as string;
     const time = formData.get('time') as string;
     const duration = formData.get('duration') as string; // in hours
@@ -35,6 +36,7 @@ export async function createEvent(courtId: string, formData: FormData) {
         court_id: courtId,
         // business_id: ... only if owner
         title,
+        description,
         starts_at: startDateTime.toISOString(),
         ends_at: endDateTime.toISOString(),
         event_kind: kind,

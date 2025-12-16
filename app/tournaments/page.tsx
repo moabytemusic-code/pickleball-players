@@ -50,8 +50,8 @@ export default async function TournamentsPage({ searchParams }: { searchParams: 
                             key={f.label}
                             href={f.value ? `/tournaments?type=${f.value}` : '/tournaments'}
                             className={`px-4 py-2 rounded-full text-sm font-semibold transition-colors border ${type === f.value
-                                    ? "bg-primary text-white border-primary"
-                                    : "bg-card hover:bg-secondary text-foreground border-border"
+                                ? "bg-primary text-white border-primary"
+                                : "bg-card hover:bg-secondary text-foreground border-border"
                                 }`}
                         >
                             {f.label}
@@ -63,7 +63,7 @@ export default async function TournamentsPage({ searchParams }: { searchParams: 
                 {events && events.length > 0 ? (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         {events.map((event: any) => (
-                            <Link href={`/court/${event.court_id}`} key={event.id} className="group block bg-card rounded-2xl border border-border overflow-hidden hover:shadow-md transition-all hover:border-primary/50">
+                            <Link href={`/tournaments/${event.id}`} key={event.id} className="group block bg-card rounded-2xl border border-border overflow-hidden hover:shadow-md transition-all hover:border-primary/50">
                                 <div className="h-32 bg-secondary/50 relative">
                                     <div className="absolute top-4 left-4 bg-background/90 backdrop-blur rounded-lg px-3 py-1.5 flex flex-col items-center border border-border">
                                         <span className="text-xs font-bold text-primary uppercase">{new Date(event.starts_at).toLocaleString('default', { month: 'short' })}</span>
