@@ -39,7 +39,9 @@ function SearchPageContent() {
 
                 if (query) {
                     // Search by Name or City (Case insensitive)
-                    queryBuilder = queryBuilder.or(`name.ilike.%${query}%,city.ilike.%${query}%`);
+                    // Fix: PostgREST .or() breaks on commas in the value string, so we split "Austin, TX" -> "Austin"
+                    const cleanQuery = query.split(',')[0].trim();
+                    queryBuilder = queryBuilder.or(`name.ilike.%${cleanQuery}%,city.ilike.%${cleanQuery}%`);
                 }
 
                 const { data, error } = await queryBuilder.order('created_at', { ascending: false });
