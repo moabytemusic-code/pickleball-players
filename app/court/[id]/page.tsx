@@ -3,6 +3,8 @@ import { notFound } from "next/navigation";
 import { MapPin, Share, Star, Calendar, Clock, Phone, Globe, ShieldCheck, Users } from "lucide-react";
 import { Navbar } from "@/components/navbar";
 
+import { ReviewsSection } from "@/components/reviews";
+
 // Next.js 15+ Params are Promises
 export default async function CourtPage({ params }: { params: Promise<{ id: string }> }) {
     const { id } = await params;
@@ -13,6 +15,16 @@ export default async function CourtPage({ params }: { params: Promise<{ id: stri
         .select('*')
         .eq('id', id)
         .single();
+
+    // Fetch Reviews
+    const { data: reviews } = await supabase
+        .from('reviews')
+        .select('*')
+        .eq('court_id', id)
+        .order('created_at', { ascending: false });
+
+    // Fetch User
+    const { data: { user } } = await supabase.auth.getUser();
 
     if (error || !court) {
         notFound();
@@ -97,6 +109,7 @@ export default async function CourtPage({ params }: { params: Promise<{ id: stri
                         </div>
                     </section>
 
+
                     {/* Events Mock */}
                     <section>
                         <div className="flex items-center justify-between mb-6">
@@ -124,6 +137,15 @@ export default async function CourtPage({ params }: { params: Promise<{ id: stri
                                 </div>
                             ))}
                         </div>
+                    </section>
+
+                    {/* Reviews */}
+                    <section>
+                        <ReviewsSection
+                            courtId={court.id}
+                            initialReviews={reviews || []}
+                            userId={user?.id}
+                        />
                     </section>
 
                 </div>
