@@ -26,8 +26,7 @@ export async function POST(req: Request) {
             .from('businesses')
             .insert({
                 owner_user_id: user.id,
-                name: 'My Business', // Default name, can be updated later
-                status: 'pending'
+                business_name: 'My Business'
             })
             .select()
             .single();
