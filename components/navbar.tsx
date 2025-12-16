@@ -82,7 +82,6 @@ export function Navbar({ position = "absolute", className = "" }: NavbarProps) {
 
                 {/* Desktop Right CTA */}
                 <div className="hidden lg:flex lg:flex-1 lg:justify-end gap-x-4">
-                    <ModeToggle />
                     {user ? (
                         <div className="flex items-center gap-4">
                             <Link href="/profile" className="text-sm font-semibold text-foreground hover:text-primary transition-colors">
