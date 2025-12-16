@@ -174,3 +174,40 @@ export async function deleteUser(userId: string) {
     revalidatePath('/admin/users');
     return { success: true };
 }
+
+export async function updateUserProfile(userId: string, data: { email?: string, password?: string, full_name?: string, role?: string, sub_roles?: string[] }) {
+    if (!await checkAdmin()) return { error: "Unauthorized" };
+
+    const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+    if (!serviceRoleKey) return { error: "Missing Admin Key" };
+
+    const adminAuthClient = (await import('@supabase/supabase-js')).createClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        serviceRoleKey,
+        { auth: { autoRefreshToken: false, persistSession: false } }
+    );
+
+    const updates: any = {};
+    if (data.email) updates.email = data.email;
+    if (data.password) updates.password = data.password;
+
+    // Metadata updates
+    if (data.full_name) {
+        updates.user_metadata = { full_name: data.full_name };
+    }
+
+    // Role & Sub Roles (App Metadata)
+    if (data.role || data.sub_roles) {
+        updates.app_metadata = {};
+        if (data.role) updates.app_metadata.role = data.role;
+        if (data.sub_roles) updates.app_metadata.sub_roles = data.sub_roles;
+    }
+
+    const { error } = await adminAuthClient.auth.admin.updateUserById(userId, updates);
+
+    if (error) return { error: error.message };
+
+    revalidatePath('/admin/users');
+    revalidatePath(`/admin/users/${userId}`);
+    return { success: true };
+}

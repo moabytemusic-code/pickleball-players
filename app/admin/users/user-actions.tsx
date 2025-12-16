@@ -1,10 +1,12 @@
 'use client';
 
 import { useState } from 'react';
-import { MoreHorizontal, Loader2, Shield, Trash } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { MoreHorizontal, Loader2, Shield, Trash, Edit } from 'lucide-react';
 import { updateUserRole, deleteUser } from '../actions';
 
 export function UserActions({ userId, currentRole }: { userId: string, currentRole: string }) {
+    const router = useRouter();
     const [loading, setLoading] = useState(false);
     const [isOpen, setIsOpen] = useState(false);
 
@@ -37,6 +39,13 @@ export function UserActions({ userId, currentRole }: { userId: string, currentRo
                 <>
                     <div className="fixed inset-0 z-10" onClick={() => setIsOpen(false)} />
                     <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-100 z-20 overflow-hidden">
+                        <button
+                            onClick={() => router.push(`/admin/users/${userId}`)}
+                            className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2 border-b border-gray-100"
+                        >
+                            <Edit size={16} />
+                            Edit Profile
+                        </button>
                         <button
                             onClick={handleRoleUpdate}
                             disabled={loading}

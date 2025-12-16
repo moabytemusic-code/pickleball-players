@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase-server";
+import { createClient as createAdminClient } from '@supabase/supabase-js'
 import { Navbar } from "@/components/navbar";
 import { redirect } from "next/navigation";
 import EditForm from "./edit-form";
@@ -10,21 +11,31 @@ export default async function AdminCourtEditPage({ params }: { params: { id: str
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) redirect('/login');
 
-    const { data: court } = await supabase
+    const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+    const supabaseAdmin = createAdminClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        serviceRoleKey || '',
+        { auth: { autoRefreshToken: false, persistSession: false } }
+    );
+
+    // Use Admin client to bypass RLS
+    const { data: court, error } = await supabaseAdmin
         .from('courts')
         .select('*')
         .eq('id', params.id)
         .single();
 
-    if (!court) {
+    if (error || !court) {
         return (
             <div className="p-12 text-center">
-                <h1 className="text-xl font-bold">Court Not Found</h1>
+                <h1 className="text-xl font-bold text-red-600">Court Not Found</h1>
+                <p className="text-gray-500 mt-2">ID: {params.id}</p>
+                <p className="text-gray-400 text-sm mt-1">{error?.message}</p>
             </div>
         );
     }
 
-    const { data: photos } = await supabase
+    const { data: photos } = await supabaseAdmin
         .from('photos')
         .select('*')
         .eq('court_id', params.id)
