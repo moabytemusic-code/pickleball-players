@@ -24,7 +24,7 @@ export default async function CommunityPage() {
         .limit(5);
 
     return (
-        <div className="min-h-screen bg-gray-50 pb-20">
+        <div className="min-h-screen bg-gray-50 dark:bg-gray-900 pb-20">
             <Navbar position="relative" />
 
             <div className="bg-primary/90 py-16 text-center text-white">
