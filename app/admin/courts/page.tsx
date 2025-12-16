@@ -47,12 +47,17 @@ export default async function AdminCourtsPage({ searchParams }: { searchParams: 
         <div className="">
             <div className="flex justify-between items-center mb-8">
                 <div>
-                    <h1 className="text-3xl font-bold text-gray-900">Court Manager ({courts?.length || 0})</h1>
+                    <h1 className="text-3xl font-bold text-gray-900">Court Manager ({courts?.length || 0}) - Updated {new Date().toISOString().substring(11, 19)}</h1>
                     <p className="text-gray-500">View and edit court details.</p>
                 </div>
                 <Link href="/admin/courts/new" className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-green-700 hidden">
                     Add Court
                 </Link>
+            </div>
+
+            <div className="bg-gray-100 p-4 mb-4 rounded overflow-auto max-h-40 text-xs font-mono">
+                <strong>DEBUG DATA (First Item):</strong>
+                <pre>{JSON.stringify(courts?.[0] || 'No Data', null, 2)}</pre>
             </div>
 
             {/* Search */}
