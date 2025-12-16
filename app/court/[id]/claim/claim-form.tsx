@@ -54,7 +54,7 @@ export function ClaimForm({ courtId }: { courtId: string }) {
                         name="business_name"
                         required
                         placeholder="e.g. Austin Parks & Rec, or private LLC"
-                        className="block w-full rounded-md border-0 py-1.5 text-black shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6 pl-2"
+                        className="block w-full rounded-md border-0 py-1.5 text-gray-900 dark:text-white bg-transparent shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6 pl-2"
                     />
                 </div>
             </div>
@@ -69,7 +69,7 @@ export function ClaimForm({ courtId }: { courtId: string }) {
                             type="text"
                             name="contact_name"
                             required
-                            className="block w-full rounded-md border-0 py-1.5 text-black shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6 pl-2"
+                            className="block w-full rounded-md border-0 py-1.5 text-gray-900 dark:text-white bg-transparent shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6 pl-2"
                         />
                     </div>
                 </div>
@@ -82,7 +82,7 @@ export function ClaimForm({ courtId }: { courtId: string }) {
                         <input
                             type="tel"
                             name="contact_phone"
-                            className="block w-full rounded-md border-0 py-1.5 text-black shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6 pl-2"
+                            className="block w-full rounded-md border-0 py-1.5 text-gray-900 dark:text-white bg-transparent shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6 pl-2"
                         />
                     </div>
                 </div>
@@ -97,7 +97,7 @@ export function ClaimForm({ courtId }: { courtId: string }) {
                         name="notes"
                         rows={3}
                         placeholder="Tell us how we can verify you own this court (e.g. website link, utility bill, etc)."
-                        className="block w-full rounded-md border-0 py-1.5 text-black shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6 pl-2"
+                        className="block w-full rounded-md border-0 py-1.5 text-gray-900 dark:text-white bg-transparent shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6 pl-2"
                     />
                 </div>
             </div>
