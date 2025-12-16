@@ -76,3 +76,57 @@ export async function rejectClaim(claimId: string) {
     revalidatePath('/admin/claims');
     return { success: true };
 }
+
+export async function updateCourt(courtId: string, data: any) {
+    if (!await checkAdmin()) return { error: "Unauthorized" };
+    const supabase = await createClient();
+
+    // Cleanup
+    const { id, created_at, updated_at, request, ...updateData } = data;
+
+    const { error } = await supabase
+        .from('courts')
+        .update(updateData)
+        .eq('id', courtId);
+
+    if (error) return { error: error.message };
+
+    revalidatePath(`/admin/courts/${courtId}`);
+    revalidatePath(`/admin/courts`);
+    revalidatePath(`/court/${courtId}`);
+    return { success: true };
+}
+
+export async function addPhoto(courtId: string, url: string) {
+    if (!await checkAdmin()) return { error: "Unauthorized" };
+    if (!url || !url.startsWith('http')) return { error: "Invalid URL" };
+
+    const supabase = await createClient();
+    const { error } = await supabase
+        .from('photos')
+        .insert({
+            court_id: courtId,
+            url: url,
+            is_primary: false,
+            sort_order: 0
+        });
+
+    if (error) return { error: error.message };
+
+    revalidatePath(`/admin/courts/${courtId}`);
+    revalidatePath(`/court/${courtId}`);
+    return { success: true };
+}
+
+export async function deletePhoto(photoId: string, courtId: string) {
+    if (!await checkAdmin()) return { error: "Unauthorized" };
+
+    const supabase = await createClient();
+    const { error } = await supabase.from('photos').delete().eq('id', photoId);
+
+    if (error) return { error: error.message };
+
+    revalidatePath(`/admin/courts/${courtId}`);
+    revalidatePath(`/court/${courtId}`);
+    return { success: true };
+}

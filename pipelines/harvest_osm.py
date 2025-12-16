@@ -79,8 +79,8 @@ def harvest_osm(location_name):
                 rev = geolocator.reverse((lat, lng), exactly_one=True)
                 if rev and 'address' in rev.raw:
                     rev_info = rev.raw['address']
-            except:
-                pass
+            except Exception as e:
+                print(f"⚠️ RevGeo Error: {e}")
             return rev_info
 
         # Name Heuristics
@@ -96,24 +96,33 @@ def harvest_osm(location_name):
                  addr = get_rev_info()
                  if addr:
                      # Look for park, leisure, or building names
+                     # print(f"DEBUG ADDR KEYS: {addr.keys()}") # Uncomment to debug
                      candidates = [
                          addr.get('leisure'), addr.get('park'), 
                          addr.get('recreation_ground'), addr.get('pitch'), 
-                         addr.get('sport_centre'), addr.get('stadium'), 
-                         addr.get('building'), addr.get('amenity'),
-                         addr.get('resort'), addr.get('centre'),
-                         addr.get('school'), addr.get('university')
+                         addr.get('sport_centre'), addr.get('community_centre'),
+                         addr.get('stadium'), addr.get('building'), 
+                         addr.get('amenity'), addr.get('resort'), 
+                         addr.get('centre'), addr.get('school'), 
+                         addr.get('university'), addr.get('college'),
+                         addr.get('hamlet'), addr.get('village') # Last resort location names
                      ]
                      site_name = next((c for c in candidates if c), None)
 
                      if site_name:
-                         name = f"{site_name} Pickleball Courts"
+                         # e.g. "Riverside Park" -> "Riverside Park Pickleball Courts"
+                         if "pickleball" in site_name.lower():
+                             name = site_name
+                         else:
+                             name = f"{site_name} Pickleball Courts"
                      elif addr.get('road'):
-                         name = f"Court on {addr.get('road')}"
+                         name = f"Courts at {addr.get('road')}"
                      else:
                          name = "Unnamed Pickleball Court"
+                         print(f"⚠️ Could not identify name from reverse geo. Tags: {tags} | Addr: {addr}")
                  else:
                      name = "Unnamed Pickleball Court"
+                     print(f"⚠️ No address info found for {lat}, {lng}")
         
         # State/Region Logic
         state = tags.get('addr:state')
