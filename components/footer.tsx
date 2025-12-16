@@ -32,12 +32,22 @@ const navigation = {
     ],
 }
 
-export function Footer() {
+import { createClient } from '@/lib/supabase-server'
+
+export async function Footer() {
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+
+    const links = [...navigation.main];
+    if (user) {
+        links.push({ name: 'Admin', href: '/admin/courts' });
+    }
+
     return (
         <footer className="bg-white border-t border-gray-200">
             <div className="mx-auto max-w-7xl overflow-hidden px-6 py-20 sm:py-24 lg:px-8">
                 <nav className="-mb-6 columns-2 sm:flex sm:justify-center sm:space-x-12" aria-label="Footer">
-                    {navigation.main.map((item) => (
+                    {links.map((item) => (
                         <div key={item.name} className="pb-6">
                             <Link href={item.href} className="text-sm leading-6 text-gray-600 hover:text-gray-900">
                                 {item.name}
