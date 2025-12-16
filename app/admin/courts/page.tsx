@@ -47,7 +47,7 @@ export default async function AdminCourtsPage({ searchParams }: { searchParams: 
         <div className="">
             <div className="flex justify-between items-center mb-8">
                 <div>
-                    <h1 className="text-3xl font-bold text-gray-900">Court Manager</h1>
+                    <h1 className="text-3xl font-bold text-gray-900">Court Manager ({courts?.length || 0})</h1>
                     <p className="text-gray-500">View and edit court details.</p>
                 </div>
                 <Link href="/admin/courts/new" className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-green-700 hidden">
@@ -86,8 +86,8 @@ export default async function AdminCourtsPage({ searchParams }: { searchParams: 
                                     <div className="flex items-center">
                                         <div className="ml-0">
                                             <div className="text-sm font-medium text-gray-900 truncate max-w-[200px]">{court.name || 'Unnamed'}</div>
-                                            <div className="text-xs text-gray-500">
-                                                {court.id ? court.id : <span className="text-red-500">MISSING ID: {Object.keys(court).join(', ')}</span>}
+                                            <div className="text-xs text-gray-500 font-mono">
+                                                {court.id ? court.id : 'NULL_ID'}
                                             </div>
                                         </div>
                                     </div>
@@ -102,13 +102,9 @@ export default async function AdminCourtsPage({ searchParams }: { searchParams: 
                                     </span>
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                    {court.id ? (
-                                        <Link href={`/admin/courts/${court.id}`} className="text-primary hover:text-green-900 flex items-center gap-1 font-medium">
-                                            <Edit2 className="w-4 h-4" /> Edit
-                                        </Link>
-                                    ) : (
-                                        <span className="text-gray-300">Unavailable</span>
-                                    )}
+                                    <Link href={`/admin/courts/${court.id}`} className="text-primary hover:text-green-900 flex items-center gap-1 font-medium">
+                                        <Edit2 className="w-4 h-4" /> Edit <span className="text-[10px] ml-1 text-gray-400">({String(court.id).substring(0, 4)})</span>
+                                    </Link>
                                 </td>
                             </tr>
                         ))}
