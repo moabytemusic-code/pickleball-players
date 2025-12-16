@@ -17,6 +17,19 @@ export default async function EditUserPage({ params }: { params: { id: string } 
     const userId = params.id;
     const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
+    // Validate UUID format
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    if (!uuidRegex.test(userId)) {
+        return (
+            <div className="max-w-4xl mx-auto p-8">
+                <div className="bg-red-50 p-4 rounded-lg text-red-700 mb-4">
+                    Invalid User ID format.
+                </div>
+                <Link href="/admin/users" className="text-primary hover:underline">&larr; Back to Users</Link>
+            </div>
+        );
+    }
+
     if (!serviceRoleKey) {
         return <div className="p-8">Error: Service Role Key missing.</div>;
     }
