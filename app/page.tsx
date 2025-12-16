@@ -23,7 +23,7 @@ export default function Home() {
         <h2 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl mb-12 text-center">Popular Destinations</h2>
         <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-8">
           {cities.map((city) => (
-            <Link href={`/search?q=${city.name}`} key={city.name} className="group relative aspect-[4/3] overflow-hidden rounded-2xl bg-gray-100 shadow-md">
+            <Link href={`/search?q=${encodeURIComponent(city.name)}`} key={city.name} className="block group relative aspect-[4/3] overflow-hidden rounded-2xl bg-gray-100 shadow-md">
               <img src={city.image} alt={city.name} className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-500" />
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-80" />
               <div className="absolute bottom-4 left-4 text-white font-bold text-lg md:text-xl flex items-center gap-2">
