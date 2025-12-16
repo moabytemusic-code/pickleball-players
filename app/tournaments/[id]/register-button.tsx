@@ -22,6 +22,13 @@ export function RegisterButton({
         const res = await registerForEvent(eventId);
         if (res.error) {
             alert(res.error);
+        } else if (res.checkoutUrl) {
+            // Redirect to Stripe
+            window.location.href = res.checkoutUrl;
+            return;
+        } else {
+            // Success (Free)
+            router.refresh();
         }
         setLoading(false);
     }
