@@ -70,6 +70,9 @@ export default function EditForm({ court, photos }: { court: any, photos: any[] 
         setLoading(false);
     }
 
+    // Shared input class with explicit colors for dark mode visibility
+    const inputClass = "mt-1 w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 border p-2 text-gray-900 bg-white";
+
     return (
         <div className="max-w-4xl mx-auto">
             <Link href="/admin/courts" className="inline-flex items-center text-gray-500 hover:text-gray-900 mb-6">
@@ -93,7 +96,7 @@ export default function EditForm({ court, photos }: { court: any, photos: any[] 
                             <input
                                 value={formData.name}
                                 onChange={e => setFormData({ ...formData, name: e.target.value })}
-                                className="mt-1 w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 border p-2"
+                                className={inputClass}
                             />
                         </div>
 
@@ -103,7 +106,7 @@ export default function EditForm({ court, photos }: { court: any, photos: any[] 
                                 <input
                                     value={formData.city}
                                     onChange={e => setFormData({ ...formData, city: e.target.value })}
-                                    className="mt-1 w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 border p-2"
+                                    className={inputClass}
                                 />
                             </div>
                             <div>
@@ -111,7 +114,7 @@ export default function EditForm({ court, photos }: { court: any, photos: any[] 
                                 <input
                                     value={formData.region}
                                     onChange={e => setFormData({ ...formData, region: e.target.value })}
-                                    className="mt-1 w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 border p-2"
+                                    className={inputClass}
                                 />
                             </div>
                         </div>
@@ -122,7 +125,7 @@ export default function EditForm({ court, photos }: { court: any, photos: any[] 
                                 rows={4}
                                 value={formData.description}
                                 onChange={e => setFormData({ ...formData, description: e.target.value })}
-                                className="mt-1 w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 border p-2"
+                                className={inputClass}
                             />
                         </div>
 
@@ -134,7 +137,7 @@ export default function EditForm({ court, photos }: { court: any, photos: any[] 
                                     step="any"
                                     value={formData.latitude}
                                     onChange={e => setFormData({ ...formData, latitude: e.target.value })}
-                                    className="mt-1 w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 border p-2"
+                                    className={inputClass}
                                 />
                             </div>
                             <div>
@@ -144,7 +147,7 @@ export default function EditForm({ court, photos }: { court: any, photos: any[] 
                                     step="any"
                                     value={formData.longitude}
                                     onChange={e => setFormData({ ...formData, longitude: e.target.value })}
-                                    className="mt-1 w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 border p-2"
+                                    className={inputClass}
                                 />
                             </div>
                         </div>
@@ -154,7 +157,7 @@ export default function EditForm({ court, photos }: { court: any, photos: any[] 
                             <input
                                 value={formData.website}
                                 onChange={e => setFormData({ ...formData, website: e.target.value })}
-                                className="mt-1 w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 border p-2"
+                                className={inputClass}
                             />
                         </div>
 
@@ -199,7 +202,7 @@ export default function EditForm({ court, photos }: { court: any, photos: any[] 
                                     placeholder="https://..."
                                     value={newPhotoUrl}
                                     onChange={e => setNewPhotoUrl(e.target.value)}
-                                    className="flex-1 rounded-md border-gray-300 text-sm p-2 bg-gray-50 border focus:bg-white transition-colors"
+                                    className="flex-1 rounded-md border-gray-300 text-sm p-2 bg-gray-50 border focus:bg-white transition-colors text-gray-900"
                                 />
                                 <button
                                     onClick={handleAddPhoto}

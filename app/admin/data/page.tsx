@@ -48,7 +48,7 @@ export default function DataImportPage() {
                                 value={city}
                                 onChange={e => setCity(e.target.value)}
                                 placeholder="e.g. Chicago, IL"
-                                className="mt-1 w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 border p-2"
+                                className="mt-1 w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 border p-2 text-gray-900 bg-white"
                             />
                             <p className="text-xs text-gray-500 mt-1">
                                 Format: "City, State" recommended.
