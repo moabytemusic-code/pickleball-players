@@ -24,6 +24,10 @@ export const viewport: Viewport = {
   initialScale: 1,
 };
 
+import { Footer } from "@/components/footer";
+
+// ...
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -36,11 +40,10 @@ export default function RootLayout({
         suppressHydrationWarning
       >
         <div className="flex min-h-full flex-col">
-          {/* Navbar Component will go here later */}
           <main className="flex-1">
             {children}
           </main>
-          {/* Footer Component will go here later */}
+          <Footer />
         </div>
       </body>
     </html>
