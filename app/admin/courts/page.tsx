@@ -81,12 +81,14 @@ export default async function AdminCourtsPage({ searchParams }: { searchParams: 
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
                         {courts?.map((court) => (
-                            <tr key={court.id} className="hover:bg-gray-50">
+                            <tr key={court.id || Math.random()} className="hover:bg-gray-50">
                                 <td className="px-6 py-4 whitespace-nowrap">
                                     <div className="flex items-center">
                                         <div className="ml-0">
-                                            <div className="text-sm font-medium text-gray-900 truncate max-w-[200px]">{court.name}</div>
-                                            <div className="text-xs text-gray-500">{court.id}</div>
+                                            <div className="text-sm font-medium text-gray-900 truncate max-w-[200px]">{court.name || 'Unnamed'}</div>
+                                            <div className="text-xs text-gray-500">
+                                                {court.id ? court.id : <span className="text-red-500">MISSING ID: {Object.keys(court).join(', ')}</span>}
+                                            </div>
                                         </div>
                                     </div>
                                 </td>
@@ -100,9 +102,13 @@ export default async function AdminCourtsPage({ searchParams }: { searchParams: 
                                     </span>
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                    <Link href={`/admin/courts/${court.id}`} className="text-primary hover:text-green-900 flex items-center gap-1 font-medium">
-                                        <Edit2 className="w-4 h-4" /> Edit
-                                    </Link>
+                                    {court.id ? (
+                                        <Link href={`/admin/courts/${court.id}`} className="text-primary hover:text-green-900 flex items-center gap-1 font-medium">
+                                            <Edit2 className="w-4 h-4" /> Edit
+                                        </Link>
+                                    ) : (
+                                        <span className="text-gray-300">Unavailable</span>
+                                    )}
                                 </td>
                             </tr>
                         ))}
