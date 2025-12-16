@@ -67,6 +67,20 @@ export function EditListingForm({ court }: { court: any }) {
                     </div>
 
                     <div>
+                        <label className="block text-sm font-medium text-gray-700">Access Type</label>
+                        <select
+                            name="access_type"
+                            defaultValue={court.access_type || 'unknown'}
+                            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2 bg-white text-black"
+                        >
+                            <option value="public">Public</option>
+                            <option value="private">Private</option>
+                            <option value="paid">Paid</option>
+                            <option value="unknown">Unknown</option>
+                        </select>
+                    </div>
+
+                    <div>
                         <label className="block text-sm font-medium text-gray-700">Surface Type</label>
                         <input
                             type="text"
@@ -87,6 +101,25 @@ export function EditListingForm({ court }: { court: any }) {
                             />
                             <span className="text-sm font-medium text-gray-700">Has Lights?</span>
                         </label>
+                    </div>
+                </div>
+
+                {/* Operating Hours */}
+                <div className="mt-8">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Operating Hours</label>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 bg-gray-50 p-4 rounded-lg border border-gray-200">
+                        {['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'].map((day) => (
+                            <div key={day}>
+                                <label className="block text-xs font-medium text-gray-500 uppercase mb-1">{day}</label>
+                                <input
+                                    type="text"
+                                    name={`hours_${day}`}
+                                    placeholder="e.g. 7am-9pm"
+                                    defaultValue={court.hours_json?.[day] || ''}
+                                    className="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-xs border p-2 text-black"
+                                />
+                            </div>
+                        ))}
                     </div>
                 </div>
             </div>
@@ -113,6 +146,15 @@ export function EditListingForm({ court }: { court: any }) {
                             type="tel"
                             name="public_phone"
                             defaultValue={court.public_phone || ''}
+                            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2 text-black"
+                        />
+                    </div>
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700">Public Email</label>
+                        <input
+                            type="email"
+                            name="public_email"
+                            defaultValue={court.public_email || ''}
                             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm border p-2 text-black"
                         />
                     </div>

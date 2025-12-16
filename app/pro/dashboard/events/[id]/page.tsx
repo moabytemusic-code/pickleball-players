@@ -66,12 +66,8 @@ export default async function EventDetailPage({ params }: { params: Promise<{ id
                 </div>
                 <div>
                     <Link
-                        href={`/court/${event.court_id}/events/${event.id}/edit`}
-                        /* Note: We haven't built the edit page at this specific URL yet, usually re-use the create form or a dedicated edit page. 
-                           For now, we can link to the public page or just hide this until Edit is ready.
-                           Actually, we can use the listing editor approach but for events.
-                        */
-                        className="hidden inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none"
+                        href={`/pro/dashboard/events/${event.id}/edit`}
+                        className="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none"
                     >
                         Edit Details
                     </Link>
