@@ -24,6 +24,11 @@ export async function POST(req: Request) {
     }
 
     // 2. Create Stripe Checkout Session for Subscription
+    if (!process.env.STRIPE_PRO_PRICE_ID) {
+        console.error("Missing STRIPE_PRO_PRICE_ID");
+        return new NextResponse("Server Configuration Error: Missing Price ID", { status: 500 });
+    }
+
     try {
         const session = await stripe.checkout.sessions.create({
             mode: 'subscription',

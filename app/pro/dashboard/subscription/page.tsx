@@ -48,15 +48,21 @@ export default function SubscriptionPage() {
             const response = await fetch('/api/create-pro-checkout', {
                 method: 'POST',
             });
+
+            if (!response.ok) {
+                const text = await response.text();
+                throw new Error(text || response.statusText);
+            }
+
             const data = await response.json();
             if (data.url) {
                 window.location.href = data.url;
             } else {
-                alert("Failed to start checkout");
+                throw new Error("No checkout URL returned");
             }
-        } catch (error) {
+        } catch (error: any) {
             console.error(error);
-            alert("An error occurred");
+            alert(`Error: ${error.message}`);
         } finally {
             setActionLoading(false);
         }
