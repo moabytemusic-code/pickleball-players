@@ -19,7 +19,8 @@ export default function ProDashboardLayout({
 
     useEffect(() => {
         async function checkAuth() {
-            const { data: { user } } = await supabase.auth.getUser();
+            const { data: { user }, error } = await supabase.auth.getUser();
+
             if (!user) {
                 router.push('/login?next=/pro/dashboard');
                 return;

@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Menu, X, Rocket, User as UserIcon, LogOut } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { supabase } from '@/lib/supabase';
+import { createClient } from '@/lib/supabase-client';
 import { User } from '@supabase/supabase-js';
 import { useRouter } from 'next/navigation';
 
@@ -17,6 +17,7 @@ export function Navbar({ position = "absolute", className = "" }: NavbarProps) {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [user, setUser] = useState<User | null>(null);
     const router = useRouter();
+    const supabase = createClient();
 
     useEffect(() => {
         const fetchUser = async () => {
@@ -96,9 +97,15 @@ export function Navbar({ position = "absolute", className = "" }: NavbarProps) {
                         </Link>
                     )}
 
-                    <Link href="/pro" className="rounded-full bg-foreground text-background px-4 py-2 text-sm font-semibold hover:bg-gray-800 dark:hover:bg-gray-200 transition-colors flex items-center gap-2">
-                        For Owners <Rocket className="w-3 h-3" />
-                    </Link>
+                    {user ? (
+                        <Link href="/pro/dashboard" className="rounded-full bg-foreground text-background px-4 py-2 text-sm font-semibold hover:bg-gray-800 dark:hover:bg-gray-200 transition-colors flex items-center gap-2">
+                            Dashboard <Rocket className="w-3 h-3" />
+                        </Link>
+                    ) : (
+                        <Link href="/pro" className="rounded-full bg-foreground text-background px-4 py-2 text-sm font-semibold hover:bg-gray-800 dark:hover:bg-gray-200 transition-colors flex items-center gap-2">
+                            For Owners <Rocket className="w-3 h-3" />
+                        </Link>
+                    )}
                 </div>
             </nav>
 
@@ -162,13 +169,23 @@ export function Navbar({ position = "absolute", className = "" }: NavbarProps) {
                                             Log in
                                         </Link>
                                     )}
-                                    <Link
-                                        href="/pro"
-                                        className="-mx-3 block rounded-lg px-3 py-2.5 text-base font-semibold leading-7 text-primary hover:bg-gray-50 dark:hover:bg-gray-800"
-                                        onClick={() => setMobileMenuOpen(false)}
-                                    >
-                                        For Owners
-                                    </Link>
+                                    {user ? (
+                                        <Link
+                                            href="/pro/dashboard"
+                                            className="-mx-3 block rounded-lg px-3 py-2.5 text-base font-semibold leading-7 text-primary hover:bg-gray-50 dark:hover:bg-gray-800"
+                                            onClick={() => setMobileMenuOpen(false)}
+                                        >
+                                            Dashboard
+                                        </Link>
+                                    ) : (
+                                        <Link
+                                            href="/pro"
+                                            className="-mx-3 block rounded-lg px-3 py-2.5 text-base font-semibold leading-7 text-primary hover:bg-gray-50 dark:hover:bg-gray-800"
+                                            onClick={() => setMobileMenuOpen(false)}
+                                        >
+                                            For Owners
+                                        </Link>
+                                    )}
                                 </div>
                             </div>
                         </div>
