@@ -61,24 +61,16 @@ export async function harvestCity(cityName: string) {
         const opData = await opRes.json();
         const elements = opData.elements || [];
 
-        logs.push(`✅ Found ${elements.length} potential locations. filtering...`);
+        logs.push(`✅ Found ${elements.length} potential locations. Processing...`);
 
         let count = 0;
         let skipped = 0;
 
         for (const el of elements) {
             const tags = el.tags || {};
-
-            // Check if it's actually pickleball
-            // Heuristics: sport=pickleball OR sport=tennis + explicit mention of pickleball
             const isExplicitPickleball = tags.sport === 'pickleball' || (tags.sport === 'tennis' && JSON.stringify(tags).toLowerCase().includes('pickleball'));
 
             if (!isExplicitPickleball) {
-                // If pure tennis, verify if we want it? For now, skip pure tennis to avoid clutter.
-                // The python script might have been more permissive.
-                // Python script query: node["sport"="pickleball"] OR nwr[sport=tennis][pickleball]
-                // Our Overpass query fetched both.
-                // Let's safe filter:
                 skipped++;
                 continue;
             }
@@ -87,59 +79,120 @@ export async function harvestCity(cityName: string) {
             const lng = el.lon || el.center?.lon;
             if (!lat || !lng) continue;
 
-            // --- Naming Logic (TS Version) ---
-            let name = tags.name;
-            if (!name) {
-                if (tags.operator) name = `${tags.operator} Pickleball Courts`;
-                else if (tags.leisure === 'park') name = "Public Park Courts";
-                else name = "Unnamed Pickleball Court";
+            let finalName = tags.name;
+            let finalAddress = tags['addr:full'] || tags['addr:street'] ? `${tags['addr:street'] || ''} ${tags['addr:city'] || ''}` : '';
+            let finalCity = tags['addr:city'];
+
+            if (!finalName) {
+                const geoData = await reverseGeocode(lat, lng);
+                if (geoData) {
+                    if (geoData.placeName) finalName = `${geoData.placeName} Pickleball Courts`;
+                    if (!finalCity) finalCity = geoData.city;
+                    if (!finalAddress) finalAddress = geoData.fullAddress;
+                }
             }
 
-            // Deduplicate "Pickleball Courts Pickleball Courts"
-            name = name.replace(/ Pickleball Courts Pickleball Courts/i, " Pickleball Courts");
+            // Fallbacks
+            if (!finalName) finalName = tags.operator ? `${tags.operator} Pickleball Courts` : "Unnamed Pickleball Court";
+            if (!finalCity) finalCity = cityName.split(',')[0].trim();
 
-            // --- Insert/Upsert ---
-            // Construct address
-            let city = tags['addr:city'];
-            // Fallback city from input BBox center or search query?
-            // Just use the input cityName if tag missing
-            if (!city) city = cityName.split(',')[0].trim();
+            // Check for duplicates in DB based on Lat/Lng proximity (0.0001 deg ~= 11 meters)
+            const { data: existing } = await supabaseAdmin.rpc('find_court_by_location', {
+                lat: lat,
+                lng: lng
+            });
 
-            const { error } = await supabaseAdmin
-                .from('courts')
-                .upsert({
-                    // Simple collision detection on approximate location could be done, 
-                    // but for now we rely on Supabase ID logic - wait, we don't have external_id unique constraint.
-                    // So this WILL DUPLICATE if run multiple times.
-                    // To prevent duplication, we could SELECT first.
-                    name: name,
-                    city: city,
+            // Use UPSERT logic manually since we don't have constraints
+            let op;
+            if (existing && existing.length > 0) {
+                // Update existing
+                logs.push(`🔄 Updating info for: ${finalName}`);
+                op = supabaseAdmin.from('courts').update({
+                    name: finalName,
+                    city: finalCity,
+                    description: `Imported from OSM (Updated). Addr: ${finalAddress}. Tags: ${JSON.stringify(tags).slice(0, 100)}`
+                }).eq('id', existing[0].id);
+            } else {
+                // Insert new
+                logs.push(`✨ New Court: ${finalName}`);
+                op = supabaseAdmin.from('courts').insert({
+                    name: finalName,
+                    city: finalCity,
                     latitude: lat,
                     longitude: lng,
                     indoor_outdoor: tags.indoor === 'yes' ? 'indoor' : 'outdoor',
-                    confidence_score: 80,
+                    confidence_score: 90,
                     is_active: true,
-                    description: `Imported from OSM. Tags: ${JSON.stringify(tags).slice(0, 100)}`
-                }, { onConflict: 'id' } as any); // Upsert requires conflict target. We have none.
+                    description: `Imported from OSM. Addr: ${finalAddress}`
+                });
+            }
 
-            // Alternative: Check existence by lat/lng tolerance
-            // This is slow in loop but safer.
-            // Or just Insert.
-            // Let's do simple check:
+            const { error } = await op;
+
             if (error) {
-                logs.push(`Error saving ${name}: ${error.message}`);
+                logs.push(`⚠️ DB Error: ${error.message}`);
             } else {
-                // logs.push(`Saved: ${name}`);
                 count++;
             }
         }
 
-        logs.push(`🎉 Import Complete. Processed ${count} verified courts.`);
-
+        logs.push(`🎉 Import Complete. Processed ${count} courts.`);
     } catch (e: any) {
         logs.push(`❌ Error: ${e.message}`);
         console.error(e);
         return { success: false, logs };
+    }
+
+    return { success: true, logs };
+}
+
+export async function refineAllCourts() {
+    const logs: string[] = [];
+    logs.push("🚀 Starting Refinement Process...");
+
+    try {
+        // 1. Find candidates (Unnamed, or generic names like "Court on...")
+        const { data: candidates, error } = await supabaseAdmin
+            .from('courts')
+            .select('*')
+            .or('name.ilike.Unnamed Pickleball Court%,name.ilike.Court on%,name.ilike.Public Park Courts%,name.ilike.%Tennis Court%');
+
+        if (error) throw error;
+        if (!candidates || candidates.length === 0) {
+            logs.push("✅ No generic-named courts found to refine.");
+            return { success: true, logs };
+        }
+
+        logs.push(`found ${candidates.length} unnamed courts. Processing... (This will take ${candidates.length * 1.5} seconds)`);
+
+        let updated = 0;
+        for (const court of candidates) {
+            const geoData = await reverseGeocode(court.latitude, court.longitude);
+
+            if (geoData && geoData.placeName) {
+                const newName = `${geoData.placeName} Pickleball Courts`;
+
+                if (newName !== court.name) {
+                    await supabaseAdmin.from('courts').update({
+                        name: newName,
+                        city: geoData.city || court.city,
+                        description: court.description + ` | Refined Addr: ${geoData.fullAddress}`
+                    }).eq('id', court.id);
+
+                    logs.push(`✅ Renamed [${court.id.slice(0, 4)}]: ${newName}`);
+                    updated++;
+                } else {
+                    logs.push(`⚠️ Could not find better name for [${court.id.slice(0, 4)}]`);
+                }
+            } else {
+                logs.push(`❌ Rev-Geocode failed for ID ${court.id.slice(0, 4)}`);
+            }
+        }
+
+        logs.push(`🎉 Refinement Complete. Updated ${updated} courts.`);
+
+    } catch (e: any) {
+        logs.push(`❌ Error: ${e.message}`);
     }
 
     return { success: true, logs };

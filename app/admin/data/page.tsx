@@ -70,6 +70,30 @@ export default function DataImportPage() {
                     </div>
                 </div>
 
+                {/* Maintenance */}
+                <div className="bg-white p-6 rounded-xl shadow border border-gray-200 h-fit">
+                    <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center">
+                        <Terminal className="w-5 h-5 mr-2" /> Database Maintenance
+                    </h2>
+                    <p className="text-sm text-gray-600 mb-4">
+                        Scan the database for "Unnamed" courts and attempt to find their real names via reverse geocoding.
+                    </p>
+                    <button
+                        onClick={async () => {
+                            setLoading(true);
+                            const { refineAllCourts } = await import("../harvest");
+                            const res = await refineAllCourts();
+                            setLogs(res.logs);
+                            setLoading(false);
+                        }}
+                        disabled={loading}
+                        className="w-full flex justify-center items-center px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 shadow-sm disabled:opacity-50 transition-all"
+                    >
+                        {loading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
+                        Refine Unnamed Courts
+                    </button>
+                </div>
+
                 {/* Logs Console */}
                 <div className="bg-gray-900 rounded-xl shadow-lg overflow-hidden flex flex-col h-[500px]">
                     <div className="bg-gray-800 px-4 py-2 border-b border-gray-700 flex items-center text-gray-400 text-xs font-mono uppercase">
