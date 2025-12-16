@@ -42,6 +42,13 @@ export default function AdminLayout({
                             <MapPin size={20} />
                             Courts
                         </Link>
+                        <Link
+                            href="/admin/users"
+                            className="flex items-center gap-3 px-3 py-2 text-gray-700 rounded-md hover:bg-gray-100 mb-1"
+                        >
+                            <Users size={20} />
+                            Users
+                        </Link>
                     </nav>
                 </aside>
 
