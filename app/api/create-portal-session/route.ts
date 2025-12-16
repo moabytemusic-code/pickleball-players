@@ -33,10 +33,16 @@ export async function POST(req: Request) {
         return new NextResponse("No subscription/customer found", { status: 400 });
     }
 
+    // 3. Determine Base URL
+    const origin = req.headers.get('origin') || process.env.NEXT_PUBLIC_SITE_URL;
+    if (!origin) {
+        return new NextResponse("Server Configuration Error: Missing Base URL", { status: 500 });
+    }
+
     try {
         const session = await stripe.billingPortal.sessions.create({
             customer: subscription.stripe_customer_id,
-            return_url: `${process.env.NEXT_PUBLIC_SITE_URL}/pro/dashboard/subscription`,
+            return_url: `${origin}/pro/dashboard/subscription`,
         });
 
         return NextResponse.json({ url: session.url });

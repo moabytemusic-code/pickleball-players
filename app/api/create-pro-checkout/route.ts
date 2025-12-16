@@ -29,6 +29,12 @@ export async function POST(req: Request) {
         return new NextResponse("Server Configuration Error: Missing Price ID", { status: 500 });
     }
 
+    // 3. Determine Base URL (Env Var or Request Origin)
+    const origin = req.headers.get('origin') || process.env.NEXT_PUBLIC_SITE_URL;
+    if (!origin) {
+        return new NextResponse("Server Configuration Error: Missing Base URL", { status: 500 });
+    }
+
     try {
         const session = await stripe.checkout.sessions.create({
             mode: 'subscription',
@@ -50,8 +56,8 @@ export async function POST(req: Request) {
                     businessId: business.id
                 }
             },
-            success_url: `${process.env.NEXT_PUBLIC_SITE_URL}/pro/dashboard/subscription?success=true`,
-            cancel_url: `${process.env.NEXT_PUBLIC_SITE_URL}/pro/dashboard/subscription?canceled=true`,
+            success_url: `${origin}/pro/dashboard/subscription?success=true`,
+            cancel_url: `${origin}/pro/dashboard/subscription?canceled=true`,
         });
 
         return NextResponse.json({ url: session.url });
