@@ -83,7 +83,7 @@ export function Hero() {
                                 />
                                 <button
                                     type="submit"
-                                    className="absolute inset-y-2 right-2 flex items-center rounded-xl bg-primary px-4 py-1 text-sm font-semibold text-white shadow-sm hover:bg-green-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary transition-colors"
+                                    className="absolute inset-y-2 right-2 flex items-center rounded-xl bg-primary px-4 py-1 text-sm font-semibold text-white !text-white shadow-sm hover:bg-green-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary transition-colors"
                                 >
                                     Search
                                 </button>

@@ -105,7 +105,7 @@ export function CourtCard({ court, enableClaiming }: { court: CourtProps, enable
                         ) : (
                             <Link
                                 href={`/court/${court.id}/claim`}
-                                className="z-10 rounded-full bg-primary px-3 py-1 text-xs font-semibold text-white hover:bg-primary/90 transition-colors shadow-sm"
+                                className="z-10 rounded-full bg-primary px-3 py-1 text-xs font-semibold text-white !text-white hover:bg-primary/90 transition-colors shadow-sm"
                             >
                                 Claim This Court
                             </Link>
