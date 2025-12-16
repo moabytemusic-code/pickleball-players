@@ -23,7 +23,7 @@ export default async function EditUserPage({ params }: { params: { id: string } 
         return (
             <div className="max-w-4xl mx-auto p-8">
                 <div className="bg-red-50 p-4 rounded-lg text-red-700 mb-4">
-                    Invalid User ID format.
+                    Invalid User ID format: <strong>{userId}</strong>
                 </div>
                 <Link href="/admin/users" className="text-primary hover:underline">&larr; Back to Users</Link>
             </div>
