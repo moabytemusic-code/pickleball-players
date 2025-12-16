@@ -25,7 +25,7 @@ export default async function CommunityPage() {
 
     return (
         <div className="min-h-screen bg-gray-50 pb-20">
-            <Navbar />
+            <Navbar position="relative" />
 
             <div className="bg-primary/90 py-16 text-center text-white">
                 <div className="flex justify-center mb-4">
