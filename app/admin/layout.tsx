@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { LayoutDashboard, MapPin, Users, Settings } from "lucide-react";
+import { LayoutDashboard, MapPin, Users, Settings, TrendingUp } from "lucide-react";
 import { Navbar } from "@/components/navbar";
 
 export default function AdminLayout({
@@ -21,6 +21,13 @@ export default function AdminLayout({
                         </h2>
                     </div>
                     <nav className="px-3">
+                        <Link
+                            href="/admin"
+                            className="flex items-center gap-3 px-3 py-2 text-gray-700 rounded-md hover:bg-gray-100 mb-1"
+                        >
+                            <TrendingUp size={20} />
+                            Overview
+                        </Link>
                         <Link
                             href="/admin/claims"
                             className="flex items-center gap-3 px-3 py-2 text-gray-700 rounded-md hover:bg-gray-100 mb-1"
