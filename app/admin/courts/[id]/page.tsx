@@ -7,7 +7,8 @@ import EditForm from "./edit-form";
 
 export const dynamic = 'force-dynamic';
 
-export default async function AdminCourtEditPage({ params }: { params: { id: string } }) {
+export default async function AdminCourtEditPage({ params }: { params: Promise<{ id: string }> }) {
+    const { id } = await params;
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) redirect('/login');
@@ -16,11 +17,11 @@ export default async function AdminCourtEditPage({ params }: { params: { id: str
 
     // Validate UUID
     const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-    if (!uuidRegex.test(params.id)) {
+    if (!uuidRegex.test(id)) {
         return (
             <div className="p-12 text-center">
                 <h1 className="text-xl font-bold text-red-600">Invalid Court ID</h1>
-                <p className="text-gray-500 mt-2">The ID provided is not valid: {params.id}</p>
+                <p className="text-gray-500 mt-2">The ID provided is not valid: {id}</p>
                 <Link href="/admin/courts" className="text-primary hover:underline mt-4 block">Back to Courts</Link>
             </div>
         );
@@ -45,14 +46,14 @@ export default async function AdminCourtEditPage({ params }: { params: { id: str
     const { data: court, error } = await supabaseAdmin
         .from('courts')
         .select('*')
-        .eq('id', params.id)
+        .eq('id', id)
         .single();
 
     if (error || !court) {
         return (
             <div className="p-12 text-center">
                 <h1 className="text-xl font-bold text-red-600">Court Not Found</h1>
-                <p className="text-gray-500 mt-2">ID: {params.id}</p>
+                <p className="text-gray-500 mt-2">ID: {id}</p>
                 <p className="text-gray-400 text-sm mt-1">{error?.message}</p>
             </div>
         );
@@ -61,7 +62,7 @@ export default async function AdminCourtEditPage({ params }: { params: { id: str
     const { data: photos } = await supabaseAdmin
         .from('photos')
         .select('*')
-        .eq('court_id', params.id)
+        .eq('court_id', id)
         .order('sort_order', { ascending: true })
         .order('created_at', { ascending: false });
 

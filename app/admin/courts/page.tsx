@@ -47,17 +47,12 @@ export default async function AdminCourtsPage({ searchParams }: { searchParams: 
         <div className="">
             <div className="flex justify-between items-center mb-8">
                 <div>
-                    <h1 className="text-3xl font-bold text-gray-900">Court Manager ({courts?.length || 0}) - Updated {new Date().toISOString().substring(11, 19)}</h1>
+                    <h1 className="text-3xl font-bold text-gray-900">Court Manager</h1>
                     <p className="text-gray-500">View and edit court details.</p>
                 </div>
                 <Link href="/admin/courts/new" className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-green-700 hidden">
                     Add Court
                 </Link>
-            </div>
-
-            <div className="bg-gray-100 p-4 mb-4 rounded overflow-auto max-h-40 text-xs font-mono">
-                <strong>DEBUG DATA (First Item):</strong>
-                <pre>{JSON.stringify(courts?.[0] || 'No Data', null, 2)}</pre>
             </div>
 
             {/* Search */}
@@ -86,14 +81,12 @@ export default async function AdminCourtsPage({ searchParams }: { searchParams: 
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
                         {courts?.map((court) => (
-                            <tr key={court.id || Math.random()} className="hover:bg-gray-50">
+                            <tr key={court.id} className="hover:bg-gray-50">
                                 <td className="px-6 py-4 whitespace-nowrap">
                                     <div className="flex items-center">
                                         <div className="ml-0">
                                             <div className="text-sm font-medium text-gray-900 truncate max-w-[200px]">{court.name || 'Unnamed'}</div>
-                                            <div className="text-xs text-gray-500 font-mono">
-                                                {court.id ? court.id : 'NULL_ID'}
-                                            </div>
+                                            <div className="text-xs text-gray-500">{court.id}</div>
                                         </div>
                                     </div>
                                 </td>
@@ -108,7 +101,7 @@ export default async function AdminCourtsPage({ searchParams }: { searchParams: 
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                     <Link href={`/admin/courts/${court.id}`} className="text-primary hover:text-green-900 flex items-center gap-1 font-medium">
-                                        <Edit2 className="w-4 h-4" /> Edit <span className="text-[10px] ml-1 text-gray-400">({String(court.id).substring(0, 4)})</span>
+                                        <Edit2 className="w-4 h-4" /> Edit
                                     </Link>
                                 </td>
                             </tr>

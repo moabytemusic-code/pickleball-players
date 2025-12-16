@@ -8,13 +8,14 @@ import { EditUserForm } from "./edit-user-form";
 
 export const dynamic = 'force-dynamic';
 
-export default async function EditUserPage({ params }: { params: { id: string } }) {
+export default async function EditUserPage({ params }: { params: Promise<{ id: string }> }) {
     // 1. Verify Verification
+    const { id } = await params;
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) redirect('/login');
 
-    const userId = params.id;
+    const userId = id;
     const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
     // Validate UUID format
