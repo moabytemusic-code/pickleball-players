@@ -17,10 +17,15 @@ async function checkAdmin() {
     return true;
 }
 
+import { sendEmail } from '@/lib/email';
+
 export async function approveClaim(claimId: string, courtId: string) {
     if (!await checkAdmin()) return { error: "Unauthorized" };
 
     const supabase = await createClient();
+
+    // Fetch details for email
+    const { data: claim } = await supabase.from('claims').select('*, business:businesses(contact_email, business_name), court:courts(name)').eq('id', claimId).single();
 
     // 1. Update Claim
     const { error: claimError } = await supabase
@@ -37,6 +42,21 @@ export async function approveClaim(claimId: string, courtId: string) {
         .eq('id', courtId);
 
     if (courtError) return { error: courtError.message };
+
+    // 3. Send Email
+    if (claim?.business?.contact_email) {
+        await sendEmail({
+            to: claim.business.contact_email,
+            subject: '🎉 Your Pickleball Court Claim is Approved!',
+            html: `
+                <h2>Congratulations, ${claim.business.business_name}!</h2>
+                <p>Your claim for <strong>${claim.court.name}</strong> has been verified.</p>
+                <p>You can now access your owner dashboard to manage events and update details.</p>
+                <br/>
+                <a href="${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/court/${courtId}" style="background: #22c55e; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">Manage Court</a>
+            `
+        });
+    }
 
     revalidatePath('/admin/claims');
     return { success: true };

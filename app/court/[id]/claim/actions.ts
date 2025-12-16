@@ -42,7 +42,8 @@ export async function submitClaim(courtId: string, formData: FormData) {
             owner_user_id: user.id,
             business_name: businessName,
             contact_name: contactName,
-            contact_phone: contactPhone
+            contact_phone: contactPhone,
+            contact_email: user.email
         })
         .select()
         .single();
