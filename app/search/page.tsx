@@ -82,7 +82,7 @@ function SearchPageContent() {
         <div className="flex h-screen flex-col bg-background">
             {/* Sticky Header */}
             <div className="sticky top-0 z-40 bg-background/80 backdrop-blur-md border-b border-border">
-                <Navbar />
+                <Navbar position="relative" />
 
                 {/* Sub-Header: Filters & Sorting */}
                 <div className="flex items-center justify-between px-6 py-4 lg:px-8 border-t border-border/50">

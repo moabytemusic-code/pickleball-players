@@ -5,7 +5,12 @@ import Link from 'next/link';
 import { Menu, X, Rocket } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
-export function Navbar() {
+interface NavbarProps {
+    position?: "absolute" | "relative" | "sticky";
+    className?: string;
+}
+
+export function Navbar({ position = "absolute", className = "" }: NavbarProps) {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
     const navigation = [
@@ -15,7 +20,7 @@ export function Navbar() {
     ];
 
     return (
-        <header className="absolute inset-x-0 top-0 z-50">
+        <header className={`${position} inset-x-0 top-0 z-50 ${className}`}>
             <nav className="flex items-center justify-between p-6 lg:px-8" aria-label="Global">
 
                 {/* Logo */}
