@@ -66,7 +66,8 @@ function SearchPageContent() {
                     courtCount: court.court_count || 0,
                     features: [court.surface].filter(Boolean),
                     lat: court.latitude,
-                    lng: court.longitude
+                    lng: court.longitude,
+                    isClaimed: court.is_claimed || false
                 }));
 
                 setCourts(formatted);
@@ -79,6 +80,8 @@ function SearchPageContent() {
 
         fetchCourts();
     }, []);
+
+    const enableClaiming = searchParams.get('claim') === 'true';
 
     return (
         <div className="flex h-screen flex-col bg-background">
@@ -112,6 +115,11 @@ function SearchPageContent() {
                         </button>
                     </div>
                 </div>
+                {enableClaiming && (
+                    <div className="bg-primary/10 border-b border-primary/20 px-6 py-2 text-center text-sm font-medium text-primary">
+                        Select a court below to claim it as your own.
+                    </div>
+                )}
             </div>
 
             <div className="flex flex-1 overflow-hidden">
@@ -125,7 +133,7 @@ function SearchPageContent() {
                     ) : (
                         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2">
                             {courts.map((court) => (
-                                <CourtCard key={court.id} court={court} />
+                                <CourtCard key={court.id} court={court} enableClaiming={enableClaiming} />
                             ))}
                             {courts.length === 0 && (
                                 <div className="col-span-full text-center py-10 text-muted-foreground">

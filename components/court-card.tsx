@@ -18,9 +18,10 @@ interface CourtProps {
     isIndoor: boolean;
     courtCount: number;
     features: string[];
+    isClaimed: boolean;
 }
 
-export function CourtCard({ court }: { court: CourtProps }) {
+export function CourtCard({ court, enableClaiming }: { court: CourtProps, enableClaiming?: boolean }) {
     return (
         <div className="group relative flex flex-col overflow-hidden rounded-2xl border border-gray-200 bg-card text-card-foreground shadow-sm transition-all hover:shadow-md dark:border-gray-800">
 
@@ -96,9 +97,24 @@ export function CourtCard({ court }: { court: CourtProps }) {
                     <div className="text-xs text-muted-foreground">
                         Last updated 2 days ago
                     </div>
-                    <button className="z-10 rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary hover:bg-primary/20 transition-colors">
-                        Book Now
-                    </button>
+                    {enableClaiming ? (
+                        court.isClaimed ? (
+                            <button disabled className="z-10 rounded-full bg-gray-100 px-3 py-1 text-xs font-semibold text-gray-400 cursor-not-allowed">
+                                Already Claimed
+                            </button>
+                        ) : (
+                            <Link
+                                href={`/court/${court.id}/claim`}
+                                className="z-10 rounded-full bg-primary px-3 py-1 text-xs font-semibold text-white hover:bg-primary/90 transition-colors shadow-sm"
+                            >
+                                Claim This Court
+                            </Link>
+                        )
+                    ) : (
+                        <button className="z-10 rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary hover:bg-primary/20 transition-colors">
+                            Book Now
+                        </button>
+                    )}
                 </div>
             </div>
         </div>
