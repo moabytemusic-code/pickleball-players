@@ -53,18 +53,24 @@ export async function submitClaim(courtId: string, formData: FormData) {
     }
 
     // 4. Create Claim
+    // FOR PILOT/MVP: Auto-verify claims to let users test Pro features immediately.
+    // In production, this would be 'pending' and require manual admin review.
     const { error: claimError } = await supabase
         .from('claims')
         .insert({
             court_id: courtId,
             business_id: business.id,
-            status: 'pending',
-            verification_notes: notes
+            status: 'verified', // <--- Auto-verified for now
+            verification_notes: notes,
+            verified_at: new Date().toISOString()
         });
 
     if (claimError) {
         return { error: "Failed to submit claim: " + claimError.message };
     }
+
+    // 5. Update Court Status
+    await supabase.from('courts').update({ is_claimed: true }).eq('id', courtId);
 
     revalidatePath(`/court/${courtId}`);
     return { success: true };

@@ -7,8 +7,15 @@ import { RegisterButton } from "./register-button";
 
 export const dynamic = 'force-dynamic';
 
-export default async function EventPage({ params }: { params: Promise<{ id: string }> }) {
+export default async function EventPage({
+    params,
+    searchParams
+}: {
+    params: Promise<{ id: string }>,
+    searchParams: Promise<{ success?: string, canceled?: string }>
+}) {
     const { id } = await params;
+    const { success, canceled } = await searchParams;
 
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
@@ -61,6 +68,23 @@ export default async function EventPage({ params }: { params: Promise<{ id: stri
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                     {/* Main Content */}
                     <div className="lg:col-span-2 space-y-6">
+
+                        {success && (
+                            <div className="bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded-xl flex items-center gap-3">
+                                <span className="bg-green-100 p-1 rounded-full">✓</span>
+                                <div>
+                                    <p className="font-bold">Registration Successful!</p>
+                                    <p className="text-sm">You're in. Check your email for confirmation details.</p>
+                                </div>
+                            </div>
+                        )}
+
+                        {canceled && (
+                            <div className="bg-yellow-50 border border-yellow-200 text-yellow-800 px-4 py-3 rounded-xl">
+                                <p className="font-bold">Payment Canceled</p>
+                                <p className="text-sm">You have not been charged. Feel free to try again when you're ready.</p>
+                            </div>
+                        )}
 
                         {/* Header Card */}
                         <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">

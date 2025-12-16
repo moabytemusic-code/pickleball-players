@@ -20,7 +20,8 @@ export function ClaimForm({ courtId }: { courtId: string }) {
             setError(res.error);
         } else {
             setIsDone(true);
-            setMsg("Claim submitted! We will review your request within 24-48 hours.");
+            setIsDone(true);
+            setMsg("Success! Your claim has been verified instantly. You can now manage this court in the Pro Portal.");
         }
         setLoading(false);
     }
@@ -33,7 +34,10 @@ export function ClaimForm({ courtId }: { courtId: string }) {
                 </div>
                 <h3 className="mt-2 text-lg font-semibold text-gray-900 dark:text-gray-100">Claim Received</h3>
                 <p className="mt-1 text-sm text-gray-500">{msg}</p>
-                <div className="mt-6">
+                <div className="mt-6 flex flex-col gap-3 justify-center items-center">
+                    <a href="/pro/dashboard" className="rounded-md bg-primary px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-primary/90">
+                        Go to Pro Dashboard
+                    </a>
                     <a href={`/court/${courtId}`} className="text-sm font-semibold text-primary hover:text-primary/80">
                         &larr; Back to Court
                     </a>
