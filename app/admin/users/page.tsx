@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase-server";
+import { createClient as createAdminClient } from '@supabase/supabase-js'
 import { Navbar } from "@/components/navbar";
 import { Search, User, Shield, AlertTriangle } from "lucide-react";
 import { redirect } from "next/navigation";
@@ -6,28 +7,60 @@ import { redirect } from "next/navigation";
 export const dynamic = 'force-dynamic';
 
 export default async function AdminUsersPage({ searchParams }: { searchParams: { q?: string } }) {
+    // 1. Verify Verification (Current Admin)
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) redirect('/login');
 
     const query = searchParams.q || '';
 
-    let dbQuery = supabase
-        .from('profiles')
-        .select('*');
+    // 2. Fetch Users via Admin API (Bypasses need for profiles table)
+    const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+    let users: any[] = [];
+    let error: any = null;
 
-    if (query) {
-        dbQuery = dbQuery.ilike('email', `%${query}%`);
+    if (serviceRoleKey) {
+        const supabaseAdmin = createAdminClient(
+            process.env.NEXT_PUBLIC_SUPABASE_URL!,
+            serviceRoleKey,
+            { auth: { autoRefreshToken: false, persistSession: false } }
+        );
+
+        const { data, error: err } = await supabaseAdmin.auth.admin.listUsers({
+            page: 1,
+            perPage: 50
+        });
+
+        if (err) {
+            error = err;
+        } else {
+            users = data.users;
+            // Simple In-Memory Filter if query exists
+            if (query) {
+                const q = query.toLowerCase();
+                users = users.filter((u: any) => u.email?.toLowerCase().includes(q));
+            }
+        }
+    } else {
+        // Fallback or Error if key missing
+        error = { message: "SUPABASE_SERVICE_ROLE_KEY is missing in env. Cannot fetch user list." };
     }
 
-    const { data: users, error } = await dbQuery.order('created_at', { ascending: false }).limit(50);
+    // Map Auth User to display format
+    const displayUsers = users.map((u: any) => ({
+        id: u.id,
+        email: u.email,
+        full_name: u.user_metadata?.full_name || u.user_metadata?.name || 'N/A',
+        role: u.app_metadata?.role || 'user',
+        created_at: u.created_at
+    }));
 
     return (
         <div className="max-w-6xl mx-auto">
             <div className="flex justify-between items-center mb-8">
                 <div>
                     <h1 className="text-3xl font-bold text-gray-900">User Management</h1>
-                    <p className="text-gray-600">View registered users.</p>
+                    <p className="text-gray-600">View registered users (Auth API).</p>
                 </div>
             </div>
 
@@ -35,8 +68,9 @@ export default async function AdminUsersPage({ searchParams }: { searchParams: {
                 <div className="bg-orange-50 p-4 rounded-lg border border-orange-200 mb-6 flex items-start gap-3">
                     <AlertTriangle className="text-orange-500 w-5 h-5 shrink-0 mt-0.5" />
                     <div>
-                        <h4 className="text-sm font-bold text-orange-800">Setup Required</h4>
-                        <p className="text-sm text-orange-700">The <code>profiles</code> table is missing or not accessible. Please apply <code>database/profiles.sql</code> to your Supabase project.</p>
+                        <h4 className="text-sm font-bold text-orange-800">Connection Issue</h4>
+                        <p className="text-sm text-orange-700">{error.message}</p>
+                        {!serviceRoleKey && <p className="text-xs mt-1 text-orange-600">Add <code>SUPABASE_SERVICE_ROLE_KEY</code> to your .env.local file.</p>}
                     </div>
                 </div>
             )}
@@ -66,7 +100,7 @@ export default async function AdminUsersPage({ searchParams }: { searchParams: {
                         </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
-                        {users?.map((u: any) => (
+                        {displayUsers.map((u) => (
                             <tr key={u.id} className="hover:bg-gray-50">
                                 <td className="px-6 py-4 whitespace-nowrap">
                                     <div className="flex items-center">
@@ -81,7 +115,7 @@ export default async function AdminUsersPage({ searchParams }: { searchParams: {
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap">
                                     <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800`}>
-                                        {u.role || 'user'}
+                                        {u.role}
                                     </span>
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
@@ -94,7 +128,7 @@ export default async function AdminUsersPage({ searchParams }: { searchParams: {
                         ))}
                     </tbody>
                 </table>
-                {(!users || users.length === 0) && !error && (
+                {displayUsers.length === 0 && !error && (
                     <div className="p-12 text-center text-gray-500">No users found.</div>
                 )}
             </div>
