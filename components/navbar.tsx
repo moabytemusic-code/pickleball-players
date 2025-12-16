@@ -7,6 +7,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { createClient } from '@/lib/supabase-client';
 import { User } from '@supabase/supabase-js';
 import { useRouter } from 'next/navigation';
+import { ModeToggle } from './mode-toggle';
 
 interface NavbarProps {
     position?: "absolute" | "relative" | "sticky";
@@ -80,7 +81,8 @@ export function Navbar({ position = "absolute", className = "" }: NavbarProps) {
                 </div>
 
                 {/* Desktop Right CTA */}
-                <div className="hidden lg:flex lg:flex-1 lg:justify-end gap-x-4">
+                <div className="hidden lg:flex lg:flex-1 lg:justify-end gap-x-4 items-center">
+                    <ModeToggle />
                     {user ? (
                         <div className="flex items-center gap-4">
                             <Link href="/profile" className="text-sm font-semibold text-foreground hover:text-primary transition-colors">
@@ -136,6 +138,9 @@ export function Navbar({ position = "absolute", className = "" }: NavbarProps) {
                         <div className="mt-6 flow-root">
                             <div className="-my-6 divide-y divide-gray-500/10 dark:divide-gray-700">
                                 <div className="space-y-2 py-6">
+                                    <div className="px-3 mb-2">
+                                        <ModeToggle />
+                                    </div>
                                     {navigation.map((item) => (
                                         <Link
                                             key={item.name}
