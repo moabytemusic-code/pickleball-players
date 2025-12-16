@@ -18,9 +18,25 @@ export async function POST(req: Request) {
         .eq('owner_user_id', user.id)
         .single();
 
+    let businessId = business?.id;
+
     if (!business) {
-        // In a real flow, force them to claim/create business first
-        return new NextResponse("No business found", { status: 400 });
+        // Create a default business for the user if they don't have one yet
+        const { data: newBusiness, error: createError } = await supabase
+            .from('businesses')
+            .insert({
+                owner_user_id: user.id,
+                name: 'My Business', // Default name, can be updated later
+                status: 'pending'
+            })
+            .select()
+            .single();
+
+        if (createError || !newBusiness) {
+            console.error("Failed to create business", createError);
+            return new NextResponse("Failed to initialize business account", { status: 500 });
+        }
+        businessId = newBusiness.id;
     }
 
     // 2. Create Stripe Checkout Session for Subscription
@@ -48,12 +64,12 @@ export async function POST(req: Request) {
             customer_email: user.email,
             metadata: {
                 userId: user.id,
-                businessId: business.id,
+                businessId: businessId,
                 type: 'pro_subscription'
             },
             subscription_data: {
                 metadata: {
-                    businessId: business.id
+                    businessId: businessId
                 }
             },
             success_url: `${origin}/pro/dashboard/subscription?success=true`,
