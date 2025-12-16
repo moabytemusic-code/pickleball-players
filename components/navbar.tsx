@@ -1,9 +1,12 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Menu, X, Rocket } from 'lucide-react';
+import { Menu, X, Rocket, User as UserIcon, LogOut } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { supabase } from '@/lib/supabase';
+import { User } from '@supabase/supabase-js';
+import { useRouter } from 'next/navigation';
 
 interface NavbarProps {
     position?: "absolute" | "relative" | "sticky";
@@ -12,6 +15,28 @@ interface NavbarProps {
 
 export function Navbar({ position = "absolute", className = "" }: NavbarProps) {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+    const [user, setUser] = useState<User | null>(null);
+    const router = useRouter();
+
+    useEffect(() => {
+        const fetchUser = async () => {
+            const { data: { user } } = await supabase.auth.getUser();
+            setUser(user);
+        };
+        fetchUser();
+
+        // Listen for auth changes
+        const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+            setUser(session?.user ?? null);
+        });
+
+        return () => subscription.unsubscribe();
+    }, []);
+
+    const handleSignOut = async () => {
+        await supabase.auth.signOut();
+        router.refresh();
+    };
 
     const navigation = [
         { name: 'Find Courts', href: '/search' },
@@ -55,9 +80,22 @@ export function Navbar({ position = "absolute", className = "" }: NavbarProps) {
 
                 {/* Desktop Right CTA */}
                 <div className="hidden lg:flex lg:flex-1 lg:justify-end gap-x-4">
-                    <Link href="/login" className="text-sm font-semibold leading-6 text-foreground hover:text-primary transition-colors my-auto">
-                        Log in
-                    </Link>
+                    {user ? (
+                        <div className="flex items-center gap-4">
+                            <span className="text-sm font-semibold text-foreground/80">
+                                {user.email?.split('@')[0]}
+                            </span>
+                            <button onClick={handleSignOut} className="text-sm font-semibold leading-6 text-foreground hover:text-red-500 transition-colors my-auto flex items-center gap-1">
+                                <LogOut className="w-4 h-4" />
+                                Sign out
+                            </button>
+                        </div>
+                    ) : (
+                        <Link href="/login" className="text-sm font-semibold leading-6 text-foreground hover:text-primary transition-colors my-auto">
+                            Log in
+                        </Link>
+                    )}
+
                     <Link href="/pro" className="rounded-full bg-foreground text-background px-4 py-2 text-sm font-semibold hover:bg-gray-800 dark:hover:bg-gray-200 transition-colors flex items-center gap-2">
                         For Owners <Rocket className="w-3 h-3" />
                     </Link>
@@ -103,13 +141,27 @@ export function Navbar({ position = "absolute", className = "" }: NavbarProps) {
                                     ))}
                                 </div>
                                 <div className="py-6">
-                                    <Link
-                                        href="/login"
-                                        className="-mx-3 block rounded-lg px-3 py-2.5 text-base font-semibold leading-7 text-foreground hover:bg-gray-50 dark:hover:bg-gray-800"
-                                        onClick={() => setMobileMenuOpen(false)}
-                                    >
-                                        Log in
-                                    </Link>
+                                    {user ? (
+                                        <>
+                                            <div className="text-sm font-semibold text-foreground/80 mb-4 px-3">
+                                                {user.email}
+                                            </div>
+                                            <button
+                                                onClick={handleSignOut}
+                                                className="-mx-3 block rounded-lg px-3 py-2.5 text-base font-semibold leading-7 text-red-500 hover:bg-gray-50 dark:hover:bg-gray-800 w-full text-left"
+                                            >
+                                                Sign out
+                                            </button>
+                                        </>
+                                    ) : (
+                                        <Link
+                                            href="/login"
+                                            className="-mx-3 block rounded-lg px-3 py-2.5 text-base font-semibold leading-7 text-foreground hover:bg-gray-50 dark:hover:bg-gray-800"
+                                            onClick={() => setMobileMenuOpen(false)}
+                                        >
+                                            Log in
+                                        </Link>
+                                    )}
                                     <Link
                                         href="/pro"
                                         className="-mx-3 block rounded-lg px-3 py-2.5 text-base font-semibold leading-7 text-primary hover:bg-gray-50 dark:hover:bg-gray-800"
