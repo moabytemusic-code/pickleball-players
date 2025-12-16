@@ -82,9 +82,9 @@ export function Navbar({ position = "absolute", className = "" }: NavbarProps) {
                 <div className="hidden lg:flex lg:flex-1 lg:justify-end gap-x-4">
                     {user ? (
                         <div className="flex items-center gap-4">
-                            <span className="text-sm font-semibold text-foreground/80">
+                            <Link href="/profile" className="text-sm font-semibold text-foreground/80 hover:text-primary transition-colors">
                                 {user.email?.split('@')[0]}
-                            </span>
+                            </Link>
                             <button onClick={handleSignOut} className="text-sm font-semibold leading-6 text-foreground hover:text-red-500 transition-colors my-auto flex items-center gap-1">
                                 <LogOut className="w-4 h-4" />
                                 Sign out
@@ -143,9 +143,9 @@ export function Navbar({ position = "absolute", className = "" }: NavbarProps) {
                                 <div className="py-6">
                                     {user ? (
                                         <>
-                                            <div className="text-sm font-semibold text-foreground/80 mb-4 px-3">
+                                            <Link href="/profile" onClick={() => setMobileMenuOpen(false)} className="block text-sm font-semibold text-foreground/80 hover:text-primary mb-4 px-3">
                                                 {user.email}
-                                            </div>
+                                            </Link>
                                             <button
                                                 onClick={handleSignOut}
                                                 className="-mx-3 block rounded-lg px-3 py-2.5 text-base font-semibold leading-7 text-red-500 hover:bg-gray-50 dark:hover:bg-gray-800 w-full text-left"
