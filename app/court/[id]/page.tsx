@@ -4,6 +4,7 @@ import { MapPin, Share, Star, Calendar, Clock, Phone, Globe, ShieldCheck, Users 
 import { Navbar } from "@/components/navbar";
 
 import { ReviewsSection } from "@/components/reviews";
+import Link from "next/link";
 
 // Next.js 15+ Params are Promises
 export default async function CourtPage({ params }: { params: Promise<{ id: string }> }) {
@@ -22,6 +23,15 @@ export default async function CourtPage({ params }: { params: Promise<{ id: stri
         .select('*')
         .eq('court_id', id)
         .order('created_at', { ascending: false });
+
+    // Fetch Events
+    const { data: events } = await supabase
+        .from('events')
+        .select('*')
+        .eq('court_id', id)
+        .gt('starts_at', new Date().toISOString())
+        .order('starts_at', { ascending: true })
+        .limit(3);
 
     // Fetch User
     const { data: { user } } = await supabase.auth.getUser();
@@ -110,33 +120,62 @@ export default async function CourtPage({ params }: { params: Promise<{ id: stri
                     </section>
 
 
-                    {/* Events Mock */}
+                    {/* Events Section */}
                     <section>
                         <div className="flex items-center justify-between mb-6">
                             <h2 className="text-2xl font-bold text-foreground">Upcoming Events</h2>
-                            <a href="#" className="text-sm font-semibold text-primary hover:underline">View all</a>
+                            <div className="flex gap-4 items-center">
+                                {user && (
+                                    <Link href={`/court/${id}/events/new`} className="text-sm font-semibold text-primary hover:underline">Host Event</Link>
+                                )}
+                                <Link href="/tournaments" className="text-sm font-semibold text-muted-foreground hover:underline">View all</Link>
+                            </div>
                         </div>
 
-                        <div className="space-y-4">
-                            {[1, 2].map((i) => (
-                                <div key={i} className="flex gap-4 p-4 rounded-2xl border border-border hover:bg-secondary/30 transition-colors">
-                                    <div className="h-16 w-16 rounded-xl bg-secondary flex flex-col items-center justify-center border border-border text-center">
-                                        <span className="text-xs font-bold text-primary uppercase">Dec</span>
-                                        <span className="text-xl font-bold text-foreground">{15 + i}</span>
-                                    </div>
-                                    <div>
-                                        <h3 className="font-bold text-foreground">Beginner Clinic: Level 1.0 - 2.5</h3>
-                                        <div className="flex items-center gap-4 mt-1 text-sm text-muted-foreground">
-                                            <span className="flex items-center gap-1"><Clock className="w-3.5 h-3.5" /> 9:00 AM - 11:00 AM</span>
-                                            <span className="flex items-center gap-1"><Users className="w-3.5 h-3.5" /> 8 spots left</span>
+                        {events && events.length > 0 ? (
+                            <div className="space-y-4">
+                                {events.map((event) => (
+                                    <div key={event.id} className="flex gap-4 p-4 rounded-2xl border border-border hover:bg-secondary/30 transition-colors">
+                                        <div className="h-16 w-16 min-w-[4rem] rounded-xl bg-secondary flex flex-col items-center justify-center border border-border text-center">
+                                            <span className="text-xs font-bold text-primary uppercase">{new Date(event.starts_at).toLocaleString('default', { month: 'short' })}</span>
+                                            <span className="text-xl font-bold text-foreground">{new Date(event.starts_at).getDate()}</span>
+                                        </div>
+                                        <div className="flex-1 min-w-0">
+                                            <div className="flex items-center gap-2 mb-1">
+                                                <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-primary/10 text-primary uppercase tracking-wide">
+                                                    {event.event_kind?.replace('_', ' ') || 'Event'}
+                                                </span>
+                                            </div>
+                                            <h3 className="font-bold text-foreground truncate">{event.title}</h3>
+                                            <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-1 text-sm text-muted-foreground">
+                                                <span className="flex items-center gap-1">
+                                                    <Clock className="w-3.5 h-3.5" />
+                                                    {new Date(event.starts_at).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}
+                                                </span>
+                                                {event.skill_level && (
+                                                    <span className="flex items-center gap-1"><Users className="w-3.5 h-3.5" /> {event.skill_level}</span>
+                                                )}
+                                                <span className="flex items-center gap-1 font-medium text-foreground">
+                                                    {event.cost_cents ? `$${(event.cost_cents / 100).toFixed(2)}` : 'Free'}
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div className="ml-auto flex items-center">
+                                            <button className="text-sm font-semibold border border-border rounded-lg px-4 py-2 hover:bg-background whitespace-nowrap">Register</button>
                                         </div>
                                     </div>
-                                    <div className="ml-auto flex items-center">
-                                        <button className="text-sm font-semibold border border-border rounded-lg px-4 py-2 hover:bg-background">Register</button>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
+                                ))}
+                            </div>
+                        ) : (
+                            <div className="p-8 text-center bg-secondary/20 rounded-2xl border border-dashed border-border">
+                                <Calendar className="w-8 h-8 text-muted-foreground mx-auto mb-2" />
+                                <p className="text-muted-foreground">No upcoming events scheduled.</p>
+                                {/* Only show Create Event if user is logged in (optional feature) */}
+                                {user && (
+                                    <Link href={`/court/${id}/events/new`} className="mt-2 text-sm text-primary cursor-pointer hover:underline">Host an Open Play?</Link>
+                                )}
+                            </div>
+                        )}
                     </section>
 
                     {/* Reviews */}
