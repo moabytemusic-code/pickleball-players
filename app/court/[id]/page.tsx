@@ -186,6 +186,15 @@ export default async function CourtPage({ params }: { params: Promise<{ id: stri
                                 <Globe className="w-5 h-5 text-muted-foreground shrink-0" />
                                 <a href="#" className="text-sm text-primary hover:underline cursor-pointer">Visit Website</a>
                             </div>
+
+                            {!court.is_claimed && (
+                                <div className="mt-8 pt-6 border-t border-border">
+                                    <a href={`/court/${court.id}/claim`} className="flex items-center gap-2 text-sm font-semibold text-muted-foreground hover:text-primary transition-colors">
+                                        <ShieldCheck className="w-4 h-4" />
+                                        Own this court? Claim it
+                                    </a>
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>
