@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Menu, X, Rocket, User as UserIcon, LogOut } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { ModeToggle } from '@/components/mode-toggle';
 import { createClient } from '@/lib/supabase-client';
 import { User } from '@supabase/supabase-js';
 import { useRouter } from 'next/navigation';
@@ -81,6 +82,7 @@ export function Navbar({ position = "absolute", className = "" }: NavbarProps) {
 
                 {/* Desktop Right CTA */}
                 <div className="hidden lg:flex lg:flex-1 lg:justify-end gap-x-4">
+                    <ModeToggle />
                     {user ? (
                         <div className="flex items-center gap-4">
                             <Link href="/profile" className="text-sm font-semibold text-foreground hover:text-primary transition-colors">

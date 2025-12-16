@@ -25,6 +25,7 @@ export const viewport: Viewport = {
 };
 
 import { Footer } from "@/components/footer";
+import { ThemeProvider } from "@/components/theme-provider";
 
 // ...
 
@@ -39,12 +40,19 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased h-full bg-background text-foreground`}
         suppressHydrationWarning
       >
-        <div className="flex min-h-full flex-col">
-          <main className="flex-1">
-            {children}
-          </main>
-          <Footer />
-        </div>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <div className="flex min-h-full flex-col">
+            <main className="flex-1">
+              {children}
+            </main>
+            <Footer />
+          </div>
+        </ThemeProvider>
       </body>
     </html>
   );
