@@ -1,7 +1,8 @@
 import { createClient } from "@/lib/supabase-server";
+import { createClient as createAdminClient } from '@supabase/supabase-js'
 import { Navbar } from "@/components/navbar";
 import Link from "next/link";
-import { Search, MapPin, Edit2, CheckCircle, XCircle } from "lucide-react";
+import { Search, MapPin, Edit2, CheckCircle, XCircle, AlertTriangle } from "lucide-react";
 import { redirect } from "next/navigation";
 
 export const dynamic = 'force-dynamic';
@@ -11,11 +12,22 @@ export default async function AdminCourtsPage({ searchParams }: { searchParams: 
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) redirect('/login');
 
+    const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+    if (!serviceRoleKey) {
+        return <div className="p-8 text-red-600">Error: SUPABASE_SERVICE_ROLE_KEY missing.</div>;
+    }
+
+    const supabaseAdmin = createAdminClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        serviceRoleKey,
+        { auth: { autoRefreshToken: false, persistSession: false } }
+    );
+
     const query = searchParams.q || '';
     const page = parseInt(searchParams.page || '1');
     const pageSize = 20;
 
-    let dbQuery = supabase
+    let dbQuery = supabaseAdmin
         .from('courts')
         .select('*', { count: 'exact' });
 
