@@ -12,9 +12,19 @@ export default async function AdminCourtEditPage({ params }: { params: { id: str
     if (!user) redirect('/login');
 
     const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+    if (!serviceRoleKey) {
+        return (
+            <div className="p-12 text-center">
+                <h1 className="text-xl font-bold text-red-600">Configuration Error</h1>
+                <p className="text-gray-500 mt-2">Missing SUPABASE_SERVICE_ROLE_KEY environment variable.</p>
+            </div>
+        );
+    }
+
     const supabaseAdmin = createAdminClient(
         process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        serviceRoleKey || '',
+        serviceRoleKey,
         { auth: { autoRefreshToken: false, persistSession: false } }
     );
 
