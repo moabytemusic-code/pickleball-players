@@ -25,6 +25,7 @@ export default function SearchPage() {
 
 function SearchPageContent() {
     const [showMap, setShowMap] = useState(false);
+    const [filterIndoor, setFilterIndoor] = useState(false);
     const [courts, setCourts] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const searchParams = useSearchParams();
@@ -40,6 +41,10 @@ function SearchPageContent() {
                 if (query) {
                     const cleanQuery = query.split(',')[0].trim();
                     queryBuilder = queryBuilder.or(`name.ilike.%${cleanQuery}%,city.ilike.%${cleanQuery}%`);
+                }
+
+                if (filterIndoor) {
+                    queryBuilder = queryBuilder.eq('indoor_outdoor', 'indoor');
                 }
 
                 const { data, error } = await queryBuilder.order('created_at', { ascending: false });
@@ -98,7 +103,7 @@ function SearchPageContent() {
         }
 
         fetchCourts();
-    }, [query]);
+    }, [query, filterIndoor]);
 
     const enableClaiming = searchParams.get('claim') === 'true';
 
@@ -116,7 +121,15 @@ function SearchPageContent() {
                             Filters
                         </button>
                         <div className="hidden sm:flex items-center gap-2 border-l border-border pl-2 ml-2">
-                            <button className="rounded-full px-3 py-1.5 text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground transition-colors">Indoor</button>
+                            <button
+                                onClick={() => setFilterIndoor(!filterIndoor)}
+                                className={`rounded-full px-3 py-1.5 text-sm font-medium transition-colors ${filterIndoor
+                                        ? "bg-primary text-primary-foreground hover:bg-primary/90"
+                                        : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                                    }`}
+                            >
+                                Indoor
+                            </button>
                             <button className="rounded-full px-3 py-1.5 text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground transition-colors">Open Now</button>
                         </div>
                     </div>
