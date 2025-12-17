@@ -97,7 +97,13 @@ export async function harvestCity(cityName: string) {
 
         for (const el of elements) {
             const tags = el.tags || {};
-            const isExplicitPickleball = tags.sport === 'pickleball' || (tags.sport === 'tennis' && JSON.stringify(tags).toLowerCase().includes('pickleball'));
+            const tagString = JSON.stringify(tags).toLowerCase();
+            const isExplicitPickleball =
+                tags.sport === 'pickleball' ||
+                (tags.sport === 'tennis' && tagString.includes('pickleball')) ||
+                tagString.includes('pickleball court') ||
+                tags.description?.toLowerCase().includes('pickleball') ||
+                tags.note?.toLowerCase().includes('pickleball');
 
             if (!isExplicitPickleball) {
                 skipped++;
@@ -126,10 +132,30 @@ export async function harvestCity(cityName: string) {
             if (!finalCity) finalCity = cityName.split(',')[0].trim();
 
             // Check for duplicates in DB based on Lat/Lng proximity (0.0001 deg ~= 11 meters)
-            const { data: existing } = await supabaseAdmin.rpc('find_court_by_location', {
+            // Check for duplicates in DB based on Lat/Lng proximity
+            // Try RPC first
+            let existing: any[] | null = null;
+
+            const { data, error: rpcError } = await supabaseAdmin.rpc('find_court_by_location', {
                 lat: lat,
                 lng: lng
             });
+
+            if (!rpcError && data) {
+                existing = data;
+            } else {
+                // Fallback if RPC missing
+                if (rpcError) console.warn("RPC find_court_by_location failed, using fallback:", rpcError.message);
+                const { data: fallbackData } = await supabaseAdmin
+                    .from('courts')
+                    .select('id')
+                    .gte('latitude', lat - 0.0005)
+                    .lte('latitude', lat + 0.0005)
+                    .gte('longitude', lng - 0.0005)
+                    .lte('longitude', lng + 0.0005)
+                    .limit(1);
+                existing = fallbackData;
+            }
 
             // Use UPSERT logic manually since we don't have constraints
             let op;
