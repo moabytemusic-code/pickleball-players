@@ -35,11 +35,9 @@ function SearchPageContent() {
             try {
                 let queryBuilder = supabase
                     .from('courts')
-                    .select('*');
+                    .select('*, photos(url, is_primary)');
 
                 if (query) {
-                    // Search by Name or City (Case insensitive)
-                    // Fix: PostgREST .or() breaks on commas in the value string, so we split "Austin, TX" -> "Austin"
                     const cleanQuery = query.split(',')[0].trim();
                     queryBuilder = queryBuilder.or(`name.ilike.%${cleanQuery}%,city.ilike.%${cleanQuery}%`);
                 }
@@ -48,27 +46,48 @@ function SearchPageContent() {
 
                 if (error) {
                     console.error("Supabase Error:", error);
-                    // Fallback to empty if fails
                     setCourts([]);
                     return;
                 }
 
-                // Transform data for UI
-                const formatted = (data || []).map(court => ({
-                    id: court.id,
-                    name: court.name,
-                    address: [court.address1, court.city, court.region].filter(Boolean).join(', '),
-                    image: "https://images.unsplash.com/photo-1626244422527-8898b95886d4?auto=format&fit=crop&q=80&w=800", // Dynamic photos later
-                    rating: 0, // Not in DB yet
-                    reviewCount: 0,
-                    isVerified: court.verified_badge || false,
-                    isIndoor: court.indoor_outdoor === 'indoor',
-                    courtCount: court.court_count || 0,
-                    features: [court.surface].filter(Boolean),
-                    lat: court.latitude,
-                    lng: court.longitude,
-                    isClaimed: court.is_claimed || false
-                }));
+                // Transform data
+                const formatted = (data || []).map(court => {
+                    // Logic: 1. DB Photo, 2. City Fallback, 3. Generic Fallback
+                    let imageUrl = "/destinations/default_court.png";
+
+                    if (court.photos && court.photos.length > 0) {
+                        // Prioritize primary, else first
+                        const primary = court.photos.find((p: any) => p.is_primary);
+                        imageUrl = primary ? primary.url : court.photos[0].url;
+                    } else if (court.city) {
+                        const cityLower = court.city.toLowerCase();
+                        if (cityLower.includes('seattle')) imageUrl = "/destinations/seattle.png";
+                        else if (cityLower.includes('san diego') || cityLower.includes('san-diego')) imageUrl = "/destinations/san-diego.png";
+                        else if (cityLower.includes('naples')) imageUrl = "/destinations/naples.png";
+                        else if (cityLower.includes('austin')) imageUrl = "/destinations/austin.png";
+                        else if (cityLower.includes('denver')) imageUrl = "/destinations/denver.png";
+                        else if (cityLower.includes('phoenix')) imageUrl = "/destinations/phoenix.png";
+                        else if (cityLower.includes('houston')) imageUrl = "/destinations/houston.png";
+                        else if (cityLower.includes('miami')) imageUrl = "/destinations/miami.png";
+                        else if (cityLower.includes('new york') || cityLower.includes('nyc')) imageUrl = "/destinations/nyc.png";
+                    }
+
+                    return {
+                        id: court.id,
+                        name: court.name,
+                        address: [court.address1, court.city, court.region].filter(Boolean).join(', '),
+                        image: imageUrl,
+                        rating: 0,
+                        reviewCount: 0,
+                        isVerified: court.verified_badge || false,
+                        isIndoor: court.indoor_outdoor === 'indoor',
+                        courtCount: court.court_count || 0,
+                        features: [court.surface].filter(Boolean),
+                        lat: court.latitude,
+                        lng: court.longitude,
+                        isClaimed: court.is_claimed || false
+                    };
+                });
 
                 setCourts(formatted);
             } catch (e) {
@@ -79,7 +98,7 @@ function SearchPageContent() {
         }
 
         fetchCourts();
-    }, []);
+    }, [query]);
 
     const enableClaiming = searchParams.get('claim') === 'true';
 
