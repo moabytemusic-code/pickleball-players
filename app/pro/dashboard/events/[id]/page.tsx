@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase-server'
 import { notFound, redirect } from 'next/navigation'
 import Link from 'next/link'
 import { ArrowLeft, Calendar, DollarSign, Users, Mail, CheckCircle, Clock } from 'lucide-react'
+import { RegistrationsTable } from './registrations-table'
 
 export default async function EventDetailPage({ params }: { params: Promise<{ id: string }> }) {
     const { id } = await params;
@@ -108,74 +109,7 @@ export default async function EventDetailPage({ params }: { params: Promise<{ id
             </div>
 
             {/* Attendees List */}
-            <div className="bg-white shadow-sm border border-gray-200 rounded-lg overflow-hidden">
-                <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
-                    <h3 className="text-lg font-medium text-gray-900">Attendees</h3>
-                    <button className="text-sm text-primary hover:underline">Download CSV</button>
-                </div>
-                <div className="overflow-x-auto">
-                    <table className="min-w-full divide-y divide-gray-200">
-                        <thead className="bg-gray-50">
-                            <tr>
-                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Player
-                                </th>
-                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Email
-                                </th>
-                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Data Registered
-                                </th>
-                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Payment
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody className="bg-white divide-y divide-gray-200">
-                            {registrations?.map((reg: any) => (
-                                <tr key={reg.user_id + reg.event_id}>
-                                    <td className="px-6 py-4 whitespace-nowrap">
-                                        <div className="text-sm font-medium text-gray-900">
-                                            {reg.profiles?.first_name
-                                                ? `${reg.profiles.first_name} ${reg.profiles.last_name || ''}`
-                                                : 'Unknown User'
-                                            }
-                                        </div>
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap">
-                                        <div className="flex items-center text-sm text-gray-500">
-                                            <Mail className="w-4 h-4 mr-2 text-gray-400" />
-                                            {reg.profiles?.email || 'No email provided'}
-                                            {/* Note: profiles table might not have email depending on sync, fallback needed? */}
-                                        </div>
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                        {new Date(reg.created_at).toLocaleDateString()}
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap">
-                                        {reg.payment_status === 'paid' ? (
-                                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                                                <CheckCircle className="w-3 h-3 mr-1" /> Paid
-                                            </span>
-                                        ) : (
-                                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
-                                                <Clock className="w-3 h-3 mr-1" /> Pending
-                                            </span>
-                                        )}
-                                    </td>
-                                </tr>
-                            ))}
-                            {(!registrations || registrations.length === 0) && (
-                                <tr>
-                                    <td colSpan={4} className="px-6 py-12 text-center text-gray-500">
-                                        No registrations yet.
-                                    </td>
-                                </tr>
-                            )}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+            <RegistrationsTable registrations={registrations || []} />
         </div>
     )
 }
