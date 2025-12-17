@@ -5,15 +5,15 @@ import Link from "next/link";
 import Image from "next/image";
 
 const cities = [
-  { name: 'Austin, TX', image: 'https://images.unsplash.com/photo-1531218150217-545e10dc29e9?auto=format&fit=crop&q=80&w=600' },
+  { name: 'Austin, TX', image: '/destinations/austin.png' },
   { name: 'Seattle, WA', image: '/destinations/seattle.png' },
-  { name: 'Denver, CO', image: 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&fit=crop&q=80&w=600' },
+  { name: 'Denver, CO', image: '/destinations/denver.png' },
   { name: 'San Diego, CA', image: '/destinations/san-diego.png' },
-  { name: 'Phoenix, AZ', image: 'https://images.unsplash.com/photo-1563290740-42849b28b765?auto=format&fit=crop&q=80&w=600' },
+  { name: 'Phoenix, AZ', image: '/destinations/phoenix.png' },
   { name: 'Naples, FL', image: '/destinations/naples.png' },
-  { name: 'Houston, TX', image: 'https://images.unsplash.com/photo-1530089711124-9ca31fb8e636?auto=format&fit=crop&q=80&w=600' },
-  { name: 'Miami, FL', image: 'https://images.unsplash.com/photo-1535498730771-e735b998cd64?auto=format&fit=crop&q=80&w=600' },
-  { name: 'New York, NY', image: 'https://images.unsplash.com/photo-1496442226666-8d4a0e29e128?auto=format&fit=crop&q=80&w=600' },
+  { name: 'Houston, TX', image: '/destinations/houston.png' },
+  { name: 'Miami, FL', image: '/destinations/miami.png' },
+  { name: 'New York, NY', image: '/destinations/nyc.png' },
 ];
 
 export default function Home() {
