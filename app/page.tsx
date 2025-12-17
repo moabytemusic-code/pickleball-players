@@ -2,11 +2,15 @@ import { Navbar } from "@/components/navbar";
 import { Hero } from "@/components/hero";
 import { MapPin, Trophy, Users, Search } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 
 const cities = [
   { name: 'Austin, TX', image: 'https://images.unsplash.com/photo-1531218150217-545e10dc29e9?auto=format&fit=crop&q=80&w=600' },
+  { name: 'Seattle, WA', image: '/destinations/seattle.png' },
   { name: 'Denver, CO', image: 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&fit=crop&q=80&w=600' },
+  { name: 'San Diego, CA', image: '/destinations/san-diego.png' },
   { name: 'Phoenix, AZ', image: 'https://images.unsplash.com/photo-1563290740-42849b28b765?auto=format&fit=crop&q=80&w=600' },
+  { name: 'Naples, FL', image: '/destinations/naples.png' },
   { name: 'Houston, TX', image: 'https://images.unsplash.com/photo-1530089711124-9ca31fb8e636?auto=format&fit=crop&q=80&w=600' },
   { name: 'Miami, FL', image: 'https://images.unsplash.com/photo-1535498730771-e735b998cd64?auto=format&fit=crop&q=80&w=600' },
   { name: 'New York, NY', image: 'https://images.unsplash.com/photo-1496442226666-8d4a0e29e128?auto=format&fit=crop&q=80&w=600' },
@@ -24,7 +28,13 @@ export default function Home() {
         <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-8">
           {cities.map((city) => (
             <Link href={`/search?q=${encodeURIComponent(city.name)}`} key={city.name} className="block group relative aspect-[4/3] overflow-hidden rounded-2xl bg-gray-100 shadow-md">
-              <img src={city.image} alt={city.name} className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-500" />
+              <Image
+                src={city.image}
+                alt={city.name}
+                fill
+                className="object-cover group-hover:scale-105 transition-transform duration-500"
+                sizes="(max-width: 768px) 50vw, 33vw"
+              />
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-80" />
               <div className="absolute bottom-4 left-4 text-white font-bold text-lg md:text-xl flex items-center gap-2">
                 <MapPin className="w-4 h-4 md:w-5 md:h-5 text-primary" /> {city.name}
