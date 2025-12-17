@@ -1,8 +1,24 @@
-
 'use server'
 
 import { createClient } from '@/lib/supabase-server'
 import { revalidatePath } from 'next/cache'
+
+async function verifyCourtAccess(supabase: any, courtId: string, userId: string): Promise<{ authorized: boolean, businessId?: string }> {
+    // 1. Check Claims
+    const { data: claims } = await supabase
+        .from('claims')
+        .select('*, business:businesses(owner_user_id)')
+        .eq('court_id', courtId)
+        .eq('status', 'verified');
+
+    // Find claim where business owner is current user
+    const validClaim = claims?.find((c: any) => c.business?.owner_user_id === userId);
+
+    if (validClaim) {
+        return { authorized: true, businessId: validClaim.business_id };
+    }
+    return { authorized: false };
+}
 
 export async function updateCourtDetails(courtId: string, formData: FormData) {
     const supabase = await createClient();
@@ -10,17 +26,8 @@ export async function updateCourtDetails(courtId: string, formData: FormData) {
 
     if (!user) return { error: "Unauthorized" };
 
-    // 1. Verify Ownership
-    const { data: claims } = await supabase
-        .from('claims')
-        .select('*, business:businesses(owner_user_id)')
-        .eq('court_id', courtId)
-        .eq('status', 'verified');
-
-    // Check if any of the valid claims belong to this user
-    const isOwner = claims?.some((c: any) => c.business?.owner_user_id === user.id);
-
-    if (!isOwner) {
+    const { authorized } = await verifyCourtAccess(supabase, courtId, user.id);
+    if (!authorized) {
         return { error: "You do not have permission to edit this court." };
     }
 
@@ -67,16 +74,27 @@ export async function updateCourtDetails(courtId: string, formData: FormData) {
 
 export async function deletePhoto(photoId: string, courtId: string) {
     const supabase = await createClient();
-    // Ownership check (simplified for brevity, should repeat above logic)
-    const { error } = await supabase.from('photos').delete().eq('id', photoId);
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return { error: "Unauthorized" };
+
+    const { authorized } = await verifyCourtAccess(supabase, courtId, user.id);
+    if (!authorized) return { error: "Unauthorized" };
+
+    const { error } = await supabase.from('photos').delete().eq('id', photoId).eq('court_id', courtId);
     if (error) return { error: error.message };
 
+    revalidatePath(`/court/${courtId}`);
     revalidatePath(`/pro/dashboard/listings/${courtId}`);
     return { success: true };
 }
 
 export async function setPrimaryPhoto(photoId: string, courtId: string) {
     const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return { error: "Unauthorized" };
+
+    const { authorized } = await verifyCourtAccess(supabase, courtId, user.id);
+    if (!authorized) return { error: "Unauthorized" };
 
     // Reset all others
     await supabase.from('photos').update({ is_primary: false }).eq('court_id', courtId);
@@ -93,14 +111,28 @@ export async function setPrimaryPhoto(photoId: string, courtId: string) {
 
 export async function saveUploadedPhoto(courtId: string, url: string, businessId: string) {
     const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return { error: "Unauthorized" };
+
+    const { authorized, businessId: verifiedBusinessId } = await verifyCourtAccess(supabase, courtId, user.id);
+    if (!authorized) return { error: "Unauthorized" };
+
+    // Use verifiedBusinessId instead of passed businessId to prevent spoofing
+    // Although verifyCourtAccess checks if *any* claim matches. 
+    // The photo implies a specific business_id?
+    // In our DB photo table has business_id? Step 847 shows inserting business_id.
+    // We should use the verified one.
+
     const { error } = await supabase.from('photos').insert({
         court_id: courtId,
-        business_id: businessId,
+        business_id: verifiedBusinessId, // Use verified ID
         url: url,
         is_primary: false
     });
 
     if (error) return { error: error.message };
+
+    revalidatePath(`/court/${courtId}`);
     revalidatePath(`/pro/dashboard/listings/${courtId}`);
     return { success: true };
 }

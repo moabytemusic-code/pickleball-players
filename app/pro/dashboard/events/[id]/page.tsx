@@ -4,6 +4,7 @@ import { notFound, redirect } from 'next/navigation'
 import Link from 'next/link'
 import { ArrowLeft, Calendar, DollarSign, Users, Mail, CheckCircle, Clock } from 'lucide-react'
 import { RegistrationsTable } from './registrations-table'
+import { EventActions } from './event-actions'
 
 export default async function EventDetailPage({ params }: { params: Promise<{ id: string }> }) {
     const { id } = await params;
@@ -65,7 +66,8 @@ export default async function EventDetailPage({ params }: { params: Promise<{ id
                         {event.courts?.name}
                     </p>
                 </div>
-                <div>
+                <div className="flex items-center gap-2">
+                    <EventActions eventId={event.id} isActive={event.is_active} />
                     <Link
                         href={`/pro/dashboard/events/${event.id}/edit`}
                         className="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none"
@@ -109,7 +111,7 @@ export default async function EventDetailPage({ params }: { params: Promise<{ id
             </div>
 
             {/* Attendees List */}
-            <RegistrationsTable registrations={registrations || []} />
+            <RegistrationsTable registrations={registrations || []} eventId={event.id} />
         </div>
     )
 }

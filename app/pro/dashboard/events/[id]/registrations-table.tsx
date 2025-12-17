@@ -2,6 +2,8 @@
 
 import { Mail, CheckCircle, Clock, Download, Search } from 'lucide-react'
 import { useState } from 'react'
+import { refundParticipant } from './actions'
+import { Loader2 } from 'lucide-react'
 
 interface Registration {
     user_id: string;
@@ -18,10 +20,12 @@ interface Registration {
 
 interface RegistrationsTableProps {
     registrations: Registration[];
+    eventId: string;
 }
 
-export function RegistrationsTable({ registrations }: RegistrationsTableProps) {
+export function RegistrationsTable({ registrations, eventId }: RegistrationsTableProps) {
     const [searchTerm, setSearchTerm] = useState('')
+    const [processingId, setProcessingId] = useState<string | null>(null);
 
     const filteredRegistrations = registrations.filter(reg => {
         const name = `${reg.profiles?.first_name || ''} ${reg.profiles?.last_name || ''}`.toLowerCase();
@@ -55,6 +59,16 @@ export function RegistrationsTable({ registrations }: RegistrationsTableProps) {
         link.click();
         document.body.removeChild(link);
     };
+
+    const onRefund = async (userId: string) => {
+        if (!confirm('Are you sure you want to refund this user?')) return;
+        setProcessingId(userId);
+        const res = await refundParticipant(eventId, userId);
+        if (res.error) {
+            alert(res.error);
+        }
+        setProcessingId(null);
+    }
 
     return (
         <div className="bg-white shadow-sm border border-gray-200 rounded-lg overflow-hidden">
@@ -97,6 +111,9 @@ export function RegistrationsTable({ registrations }: RegistrationsTableProps) {
                             <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                 Payment
                             </th>
+                            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Actions
+                            </th>
                         </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
@@ -130,11 +147,25 @@ export function RegistrationsTable({ registrations }: RegistrationsTableProps) {
                                         </span>
                                     )}
                                 </td>
+                                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                    {reg.payment_status === 'paid' && (
+                                        <button
+                                            onClick={() => onRefund(reg.user_id)}
+                                            disabled={processingId === reg.user_id}
+                                            className="text-red-600 hover:text-red-900 disabled:opacity-50"
+                                        >
+                                            {processingId === reg.user_id ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Refund'}
+                                        </button>
+                                    )}
+                                    {reg.payment_status === 'refunded' && (
+                                        <span className="text-gray-400">Refunded</span>
+                                    )}
+                                </td>
                             </tr>
                         ))}
                         {filteredRegistrations.length === 0 && (
                             <tr>
-                                <td colSpan={4} className="px-6 py-12 text-center text-gray-500">
+                                <td colSpan={5} className="px-6 py-12 text-center text-gray-500">
                                     {registrations.length === 0 ? "No registrations yet." : "No matching attendees found."}
                                 </td>
                             </tr>
