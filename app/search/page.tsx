@@ -57,8 +57,8 @@ function SearchPageContent() {
 
                 // Transform data
                 const formatted = (data || []).map(court => {
-                    // Logic: 1. DB Photo, 2. City Fallback, 3. Generic Fallback
-                    let imageUrl = "/destinations/default_court.png";
+                    // Logic: 1. DB Photo, 2. City Fallback, 3. Randomized Realistic Fallback
+                    let imageUrl;
 
                     if (court.photos && court.photos.length > 0) {
                         // Prioritize primary, else first
@@ -75,6 +75,18 @@ function SearchPageContent() {
                         else if (cityLower.includes('houston')) imageUrl = "/destinations/houston.png";
                         else if (cityLower.includes('miami')) imageUrl = "/destinations/miami.png";
                         else if (cityLower.includes('new york') || cityLower.includes('nyc')) imageUrl = "/destinations/nyc.png";
+                    }
+
+                    if (!imageUrl) {
+                        // Deterministic random image based on char code sum of ID
+                        const fallbackPool = [
+                            "/destinations/court_sunny.png",
+                            "/destinations/court_sunset.png",
+                            "/destinations/default_court.png"
+                        ];
+                        // Simple hash of string ID
+                        const hash = court.id.split('').reduce((acc: number, char: string) => acc + char.charCodeAt(0), 0);
+                        imageUrl = fallbackPool[hash % fallbackPool.length];
                     }
 
                     return {
@@ -124,8 +136,8 @@ function SearchPageContent() {
                             <button
                                 onClick={() => setFilterIndoor(!filterIndoor)}
                                 className={`rounded-full px-3 py-1.5 text-sm font-medium transition-colors ${filterIndoor
-                                        ? "bg-primary text-primary-foreground hover:bg-primary/90"
-                                        : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                                    ? "bg-primary text-primary-foreground hover:bg-primary/90"
+                                    : "text-muted-foreground hover:bg-muted hover:text-foreground"
                                     }`}
                             >
                                 Indoor

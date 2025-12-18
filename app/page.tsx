@@ -48,7 +48,8 @@ export default function Home() {
       </div>
 
       {/* 2. How It Works (Process) */}
-      <section className="py-24 bg-gradient-to-b from-background to-secondary/20">
+      {/* 2. How It Works (Process) */}
+      <section className="py-24 bg-gradient-to-b from-background to-secondary/20 overflow-hidden">
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
           <div className="text-center max-w-2xl mx-auto mb-16">
             <h2 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">Your Court, Your Game</h2>
@@ -57,19 +58,43 @@ export default function Home() {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-12 relative">
             {/* Connector Line (Desktop) */}
-            <div className="hidden md:block absolute top-12 left-[16%] right-[16%] h-0.5 bg-gradient-to-r from-transparent via-border to-transparent" />
+            <div className="hidden md:block absolute top-24 left-[16%] right-[16%] h-1 bg-gradient-to-r from-transparent via-emerald-500/20 to-transparent" />
 
             {[
-              { icon: Search, title: "1. Discover", desc: "Search by city, surface type, or amenities like lights and dedicated lines." },
-              { icon: CheckCircle2, title: "2. Verify & Check-in", desc: "See real-time traffic, check court conditions, and mark yourself as 'playing'." },
-              { icon: Activity, title: "3. Track Progress", desc: "Log your matches, improve your DUPR rating (coming soon), and climb the leaderboard." }
+              {
+                image: "/features/feature_discover.png",
+                fallbackIcon: Search,
+                title: "1. Discover",
+                desc: "Search by city, surface type, or amenities like lights and dedicated lines."
+              },
+              {
+                image: "/features/feature_play.png",
+                fallbackIcon: CheckCircle2,
+                title: "2. Verify & Check-in",
+                desc: "See real-time traffic, check court conditions, and mark yourself as 'playing'."
+              },
+              {
+                image: "/features/feature_stats.png",
+                fallbackIcon: Activity,
+                title: "3. Track Progress",
+                desc: "Log your matches, improve your DUPR rating (coming soon), and climb the leaderboard."
+              }
             ].map((step, i) => (
-              <div key={i} className="relative flex flex-col items-center text-center bg-background/50 p-6 rounded-2xl border border-transparent hover:border-border transition-all">
-                <div className="w-24 h-24 rounded-full bg-background border-4 border-secondary flex items-center justify-center z-10 mb-6 shadow-sm group hover:scale-110 transition-transform duration-300">
-                  <step.icon className="w-10 h-10 text-primary" />
+              <div key={i} className="relative flex flex-col items-center text-center group">
+
+                <div className="relative w-48 h-48 mb-6 transition-transform duration-500 group-hover:scale-105 group-hover:-translate-y-2">
+                  <div className="absolute inset-0 bg-emerald-500/20 blur-[60px] rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                  <Image
+                    src={step.image}
+                    alt={step.title}
+                    width={256}
+                    height={256}
+                    className="relative z-10 drop-shadow-2xl"
+                  />
                 </div>
+
                 <h3 className="text-xl font-bold text-foreground mb-3">{step.title}</h3>
-                <p className="text-muted-foreground leading-relaxed">{step.desc}</p>
+                <p className="text-muted-foreground leading-relaxed max-w-xs mx-auto">{step.desc}</p>
               </div>
             ))}
           </div>
