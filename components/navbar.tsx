@@ -12,13 +12,20 @@ import { ModeToggle } from './mode-toggle';
 interface NavbarProps {
     position?: "absolute" | "relative" | "sticky";
     className?: string;
+    forceDark?: boolean;
 }
 
-export function Navbar({ position = "absolute", className = "" }: NavbarProps) {
+export function Navbar({ position = "absolute", className = "", forceDark = false }: NavbarProps) {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [user, setUser] = useState<User | null>(null);
     const router = useRouter();
     const supabase = createClient();
+
+    // Use specific colors if forceDark is true, otherwise default to theme
+    const textColor = forceDark ? "text-white" : "text-foreground";
+    const hoverColor = forceDark ? "hover:text-emerald-400" : "hover:text-primary";
+    const logoColor = forceDark ? "text-white" : "text-foreground";
+    const buttonBg = forceDark ? "bg-white text-slate-900 hover:bg-slate-200" : "bg-foreground text-background hover:bg-gray-800 dark:hover:bg-gray-200";
 
     useEffect(() => {
         const fetchUser = async () => {
@@ -54,8 +61,8 @@ export function Navbar({ position = "absolute", className = "" }: NavbarProps) {
                 <div className="flex lg:flex-1">
                     <Link href="/" className="-m-1.5 p-1.5 flex items-center gap-2">
                         <span className="sr-only">Pickleball Players</span>
-                        <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center text-white font-bold text-xl">P</div>
-                        <span className="font-bold text-xl tracking-tight">Pickleball<span className="text-primary">Players</span></span>
+                        <div className={`h-8 w-8 rounded-lg flex items-center justify-center font-bold text-xl ${forceDark ? 'bg-emerald-500 text-white' : 'bg-primary text-white'}`}>P</div>
+                        <span className={`font-bold text-xl tracking-tight ${logoColor}`}>Pickleball<span className={forceDark ? "text-emerald-400" : "text-primary"}>Players</span></span>
                     </Link>
                 </div>
 
@@ -63,7 +70,7 @@ export function Navbar({ position = "absolute", className = "" }: NavbarProps) {
                 <div className="flex lg:hidden">
                     <button
                         type="button"
-                        className="-m-2.5 inline-flex items-center justify-center rounded-md p-2.5 text-gray-700 dark:text-gray-200"
+                        className={`-m-2.5 inline-flex items-center justify-center rounded-md p-2.5 ${textColor}`}
                         onClick={() => setMobileMenuOpen(true)}
                     >
                         <span className="sr-only">Open main menu</span>
@@ -74,7 +81,7 @@ export function Navbar({ position = "absolute", className = "" }: NavbarProps) {
                 {/* Desktop Links */}
                 <div className="hidden lg:flex lg:gap-x-12">
                     {navigation.map((item) => (
-                        <Link key={item.name} href={item.href} className="text-sm font-semibold leading-6 text-foreground hover:text-primary transition-colors">
+                        <Link key={item.name} href={item.href} className={`text-sm font-semibold leading-6 transition-colors ${textColor} ${hoverColor}`}>
                             {item.name}
                         </Link>
                     ))}
@@ -85,26 +92,26 @@ export function Navbar({ position = "absolute", className = "" }: NavbarProps) {
                     <ModeToggle />
                     {user ? (
                         <div className="flex items-center gap-4">
-                            <Link href="/profile" className="text-sm font-semibold text-foreground hover:text-primary transition-colors">
+                            <Link href="/profile" className={`text-sm font-semibold transition-colors ${textColor} ${hoverColor}`}>
                                 {user.email?.split('@')[0]}
                             </Link>
-                            <button onClick={handleSignOut} className="text-sm font-semibold leading-6 text-foreground hover:text-red-500 transition-colors my-auto flex items-center gap-1">
+                            <button onClick={handleSignOut} className={`text-sm font-semibold leading-6 transition-colors my-auto flex items-center gap-1 hover:text-red-500 ${textColor}`}>
                                 <LogOut className="w-4 h-4" />
                                 Sign out
                             </button>
                         </div>
                     ) : (
-                        <Link href="/login" className="text-sm font-semibold leading-6 text-foreground hover:text-primary transition-colors my-auto">
+                        <Link href="/login" className={`text-sm font-semibold leading-6 transition-colors my-auto ${textColor} ${hoverColor}`}>
                             Log in
                         </Link>
                     )}
 
                     {user ? (
-                        <Link href="/pro/dashboard" className="rounded-full bg-foreground text-background px-4 py-2 text-sm font-semibold hover:bg-gray-800 dark:hover:bg-gray-200 transition-colors flex items-center gap-2">
+                        <Link href="/pro/dashboard" className={`rounded-full px-4 py-2 text-sm font-semibold transition-colors flex items-center gap-2 ${buttonBg}`}>
                             Dashboard <Rocket className="w-3 h-3" />
                         </Link>
                     ) : (
-                        <Link href="/pro" className="rounded-full bg-foreground text-background px-4 py-2 text-sm font-semibold hover:bg-gray-800 dark:hover:bg-gray-200 transition-colors flex items-center gap-2">
+                        <Link href="/pro" className={`rounded-full px-4 py-2 text-sm font-semibold transition-colors flex items-center gap-2 ${buttonBg}`}>
                             For Owners <Rocket className="w-3 h-3" />
                         </Link>
                     )}
@@ -124,7 +131,7 @@ export function Navbar({ position = "absolute", className = "" }: NavbarProps) {
                         <div className="flex items-center justify-between">
                             <Link href="#" className="-m-1.5 p-1.5 flex items-center gap-2">
                                 <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center text-white font-bold text-xl">P</div>
-                                <span className="font-bold text-xl tracking-tight">Pickleball<span className="text-primary">Players</span></span>
+                                <span className="font-bold text-xl tracking-tight text-foreground">Pickleball<span className="text-primary">Players</span></span>
                             </Link>
                             <button
                                 type="button"

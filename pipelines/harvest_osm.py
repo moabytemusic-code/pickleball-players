@@ -2,6 +2,11 @@ import requests
 from geopy.geocoders import Nominatim
 from lib.db import SupabaseDB
 import time
+from dotenv import load_dotenv
+import os
+
+# Load env from project root
+load_dotenv(dotenv_path=os.path.join(os.path.dirname(os.path.dirname(__file__)), '.env.local'))
 
 def harvest_osm(location_name):
     print(f"🚀 Starting OSM Harvest for: {location_name}")
@@ -38,6 +43,15 @@ def harvest_osm(location_name):
       node["sport"="pickleball"]({min_lat},{min_lon},{max_lat},{max_lon});
       way["sport"="pickleball"]({min_lat},{min_lon},{max_lat},{max_lon});
       relation["sport"="pickleball"]({min_lat},{min_lon},{max_lat},{max_lon});
+
+      # Also find tennis courts with pickleball lines/tags (common for private clubs)
+      node["sport"="tennis"]["pickleball"]({min_lat},{min_lon},{max_lat},{max_lon});
+      way["sport"="tennis"]["pickleball"]({min_lat},{min_lon},{max_lat},{max_lon});
+      relation["sport"="tennis"]["pickleball"]({min_lat},{min_lon},{max_lat},{max_lon});
+
+      node["sport"="tennis"]["pickleball_lines"]({min_lat},{min_lon},{max_lat},{max_lon});
+      way["sport"="tennis"]["pickleball_lines"]({min_lat},{min_lon},{max_lat},{max_lon});
+      relation["sport"="tennis"]["pickleball_lines"]({min_lat},{min_lon},{max_lat},{max_lon});
     );
     out center;
     """
@@ -157,8 +171,18 @@ def harvest_osm(location_name):
         if tags.get('indoor') == 'yes': features.append('Indoor')
 
         # Fix Access Type Enum
-        access = tags.get('access', 'public').lower()
-        if access in ['yes', 'permissive', 'customers']: access = 'public'
+        access = tags.get('access')
+        if not access:
+             # Heuristic for private/membership
+             name_lower = name.lower()
+             if any(x in name_lower for x in ['country club', 'resort', 'athletic club', 'yacht club', 'golf club', 'private']):
+                 access = 'membership'
+             else:
+                 access = 'public'
+        
+        access = access.lower()
+        if access in ['yes', 'permissive']: access = 'public'
+        if access in ['customers']: access = 'public' # Treat customers as public (paid) for now, or change to private? keeping public implies "open to public"
         if access not in ['public', 'private', 'membership']: access = 'public' 
 
         # Upsert
